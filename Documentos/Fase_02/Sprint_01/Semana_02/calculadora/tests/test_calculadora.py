@@ -4,9 +4,23 @@ from src.calculadora import Calculadora
 
 class TestCalculadora:
     """Testes para a classe Calculadora."""
-   
-    def test_somar(self):
+
+    @pytest.fixture
+    def calc(self):
+        """Fixture para criar uma instância da Calculadora."""
+        return Calculadora()
+    
+    """Teste para o método somar usando pytest.mark.parametrize para testar múltiplos casos."""
+    @pytest.mark.parametrize("a, b, esperado", [
+        (2, 3, 5),
+        (-1, 1, 0),
+        (0, 0, 0),
+        (1.5, 2.5, 4.0),
+        (100, 200, 300),
+        (-2, -3, -5)
+    ])
+
+    def test_somar(self, calc, a, b, esperado):
         """Teste para o método somar."""
-        calculadora = Calculadora()
-        resultado = calculadora.somar(2, 3)
-        assert resultado == 5
+        resultado = calc.somar(a, b)
+        assert resultado == esperado
