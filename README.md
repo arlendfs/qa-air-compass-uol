@@ -32,6 +32,27 @@ Cada Sprint contém as respectivas semanas e seus entregáveis, tais como:
 * **Collections Postman**
 * **Challenges** & Apresentações
 
+---
+
+## 🚀 Fase 02 – Testes Automatizados com Python (TDD)
+
+Na **Fase 02**, o foco foi a aplicação prática de testes automatizados utilizando **Python e Pytest**, com ênfase em:
+
+* Aplicação da metodologia **TDD (Test-Driven Development)**
+* Escrita de testes parametrizados
+* Validação de exceções e casos de borda
+* Análise de cobertura com `pytest-cov`
+* Organização de estrutura modular (`src/` e `tests/`)
+
+Como atividade prática, foi desenvolvido um projeto de **Calculadora com testes automatizados**, contemplando:
+
+* Operações matemáticas básicas
+* Tratamento de erros de domínio (ex.: raiz negativa)
+* Testes de exceção
+* Comparação segura de floats com `pytest.approx`
+* Configuração de `pytest.ini` para padronização do ambiente
+
+Essa fase consolidou fundamentos essenciais de QA voltados para automação e estruturação profissional de testes.
 Essa estrutura garante clareza histórica e facilita a avaliação da progressão das atividades realizadas.
 
 ---
