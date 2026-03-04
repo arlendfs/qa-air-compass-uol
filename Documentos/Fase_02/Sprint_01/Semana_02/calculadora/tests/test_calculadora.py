@@ -114,6 +114,7 @@ class TestCalculadora:
     ])
 
     def test_potencia_zero_expoente_negativo(self, calc, base, expoente):
-        """Teste para verificar se zero elevado a um expoente negativo lança ValueError."""
-        with pytest.raises(ValueError):
+        """Teste para verificar se zero elevado a um expoente negativo lança ZeroDivisionError."""
+        with pytest.raises(ZeroDivisionError):
             calc.potencia(base, expoente)
+

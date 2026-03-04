@@ -25,3 +25,9 @@ class Calculadora:
         if a < 0:
             raise ValueError("Raiz quadrada de número negativo não é permitida.")
         return math.sqrt(a)
+
+    def potencia(self, base, expoente):
+        """Calcula a potência: base ^ expoente"""
+        if base == 0 and expoente < 0:
+            raise ZeroDivisionError("Zero elevado a expoente negativo é indefinido")
+        return base ** expoente
