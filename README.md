@@ -2,7 +2,7 @@
 
 ## 📌 Sobre o Repositório
 
-Este repositório foi criado com o objetivo de organizar, versionar e documentar todos os artefatos produzidos durante o estágio em **QA – Automação de Testes na AI/R Compass UOL - FASE 1**.
+Este repositório foi criado com o objetivo de organizar, versionar e documentar todos os artefatos produzidos durante o estágio em **QA – Automação de Testes na AI/R Compass UOL - FASE 1 e FASE 2**.
 
 Aqui estão centralizados os entregáveis desenvolvidos ao longo das sprints, organizados por **Fase, Sprint e Semana**, permitindo a rastreabilidade da evolução técnica, metodológica e prática durante o programa.
 
@@ -32,6 +32,7 @@ Cada Sprint contém as respectivas semanas e seus entregáveis, tais como:
 * **Collections Postman**
 * **Challenges** & Apresentações
 
+Essa estrutura garante clareza histórica e facilita a avaliação da progressão das atividades realizadas.
 ---
 
 ## 🚀 Fase 02 – Testes Automatizados com Python (TDD)
@@ -53,7 +54,6 @@ Como atividade prática, foi desenvolvido um projeto de **Calculadora com testes
 * Configuração de `pytest.ini` para padronização do ambiente
 
 Essa fase consolidou fundamentos essenciais de QA voltados para automação e estruturação profissional de testes.
-Essa estrutura garante clareza histórica e facilita a avaliação da progressão das atividades realizadas.
 
 ---
 
