@@ -53,3 +53,23 @@ class TestCalculadora:
         """Teste para o método multiplicar."""
         resultado = calc.multiplicar(a, b)
         assert resultado == esperado
+
+    """Teste para o método dividir usando pytest.mark.parametrize para testar múltiplos casos, incluindo divisão por zero."""
+    @pytest.mark.parametrize("a, b, esperado", [
+        (6, 3, 2),
+        (5, 2, 2.5),
+        (-8, 2, -4),
+        (8, -2, -4),
+        (-8, -2, 4),
+        (0, 5, 0),
+        (5, 0, None)
+    ])
+
+    def test_dividir(self, calc, a, b, esperado):
+        """Teste para o método dividir."""
+        if b == 0:
+            with pytest.raises(ZeroDivisionError):
+                calc.dividir(a, b)
+        else:
+            resultado = calc.dividir(a, b)
+            assert resultado == esperado
