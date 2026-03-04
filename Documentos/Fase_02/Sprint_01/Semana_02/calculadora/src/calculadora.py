@@ -10,3 +10,6 @@ class Calculadora:
         """Retorna a subtração de a por b."""
         return a - b
     
+    def multiplicar(self, a, b):
+        """Retorna a multiplicação de a por b."""
+        return a * b
