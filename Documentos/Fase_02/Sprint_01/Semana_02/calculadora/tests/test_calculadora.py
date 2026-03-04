@@ -72,3 +72,20 @@ class TestCalculadora:
         """Teste para verificar se a divisão por zero lança ValueError."""
         with pytest.raises(ValueError, match="Divisão por zero não é permitida."):
             calc.dividir(5, 0)
+
+    """Teste para o método raiz_quadrada usando pytest.mark.parametrize para testar múltiplos casos, incluindo casos de borda."""
+    @pytest.mark.parametrize("a, esperado", [
+        (4, 2),
+        (1, 1),
+        (0, 0),
+        (2, 1.41421356),
+    ])
+
+    def test_raiz_quadrada(self, calc, a, esperado):
+        """Teste para o método raiz_quadrada."""
+        assert calc.raiz_quadrada(a) == pytest.approx(esperado)
+
+    def test_raiz_quadrada_negativa(self, calc):
+        """Teste para verificar se a raiz quadrada de um número negativo lança ValueError."""
+        with pytest.raises(ValueError, match="Raiz quadrada de número negativo não é permitida."):
+            calc.raiz_quadrada(-4)
