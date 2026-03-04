@@ -39,3 +39,17 @@ class TestCalculadora:
         """Teste para o método subtrair."""
         resultado = calc.subtrair(a, b)
         assert resultado == esperado
+
+
+    @pytest.mark.parametrize("a, b, esperado", [
+        (2, 3, 6),
+        (-2, 3, -6),
+        (0, 5, 0),
+        (2.5, 2, 5.0),
+        (-3, -3, 9)
+    ])
+
+    def test_multiplicar(self, calc, a, b, esperado):
+        """Teste para o método multiplicar."""
+        resultado = calc.multiplicar(a, b)
+        assert resultado == esperado

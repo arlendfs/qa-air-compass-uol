@@ -9,3 +9,4 @@ class Calculadora:
     def subtrair(self, a, b):
         """Retorna a subtração de a por b."""
         return a - b
+    
