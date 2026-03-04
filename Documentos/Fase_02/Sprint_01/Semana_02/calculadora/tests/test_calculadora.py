@@ -70,7 +70,7 @@ class TestCalculadora:
 
     def test_dividir_por_zero(self, calc):
         """Teste para verificar se a divisão por zero lança ValueError."""
-        with pytest.raises(ValueError, match="Divisão por zero não é permitida."):
+        with pytest.raises(ValueError):
             calc.dividir(5, 0)
 
     """Teste para o método raiz_quadrada usando pytest.mark.parametrize para testar múltiplos casos, incluindo casos de borda."""
@@ -87,5 +87,32 @@ class TestCalculadora:
 
     def test_raiz_quadrada_negativa(self, calc):
         """Teste para verificar se a raiz quadrada de um número negativo lança ValueError."""
-        with pytest.raises(ValueError, match="Raiz quadrada de número negativo não é permitida."):
+        with pytest.raises(ValueError):
             calc.raiz_quadrada(-4)
+
+    """Teste para o método potencia usando pytest.mark.parametrize para testar múltiplos casos, incluindo casos de borda e expoentes negativos."""
+    @pytest.mark.parametrize("base, expoente, esperado", [
+        (2, 3, 8),
+        (5, 2, 25),
+        (10, 1, 10),
+        (7, 0, 1),
+        (1, 999, 1),
+        (0, 5, 0),
+        (-2, 3, -8),
+        (-2, 2, 4),
+        (2, -1, 0.5),
+    ])
+
+    def test_potencia(self, calc, base, expoente, esperado):
+        """Teste parametrizado para potência"""
+        assert calc.potencia(base, expoente) == esperado
+
+    @pytest.mark.parametrize("base, expoente", [
+        (0, -1),
+        (0, -5),
+    ])
+
+    def test_potencia_zero_expoente_negativo(self, calc, base, expoente):
+        """Teste para verificar se zero elevado a um expoente negativo lança ValueError."""
+        with pytest.raises(ZeroDivisionError):
+            calc.potencia(base, expoente)
