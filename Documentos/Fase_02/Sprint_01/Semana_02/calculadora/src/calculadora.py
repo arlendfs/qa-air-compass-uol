@@ -17,7 +17,7 @@ class Calculadora:
     def dividir(self, a, b):
         """Retorna a divisão de a por b. Lança ValueError se b for zero."""
         if b == 0:
-            raise ValueError("Divisão por zero não é permitida.")
+            raise ZeroDivisionError("Divisão por zero não é permitida.")
         return a / b
 
     def raiz_quadrada(self, a):

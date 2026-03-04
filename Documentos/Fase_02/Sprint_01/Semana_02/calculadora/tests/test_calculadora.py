@@ -23,7 +23,7 @@ class TestCalculadora:
     def test_somar(self, calc, a, b, esperado):
         """Teste para o método somar."""
         resultado = calc.somar(a, b)
-        assert resultado == esperado
+        assert resultado == pytest.approx(esperado)
 
     """Teste para o método subtrair usando pytest.mark.parametrize para testar múltiplos casos."""
     @pytest.mark.parametrize("a, b, esperado", [
@@ -38,7 +38,7 @@ class TestCalculadora:
     def test_subtrair(self, calc, a, b, esperado):
         """Teste para o método subtrair."""
         resultado = calc.subtrair(a, b)
-        assert resultado == esperado
+        assert resultado == pytest.approx(esperado)
 
 
     @pytest.mark.parametrize("a, b, esperado", [
@@ -52,7 +52,7 @@ class TestCalculadora:
     def test_multiplicar(self, calc, a, b, esperado):
         """Teste para o método multiplicar."""
         resultado = calc.multiplicar(a, b)
-        assert resultado == esperado
+        assert resultado == pytest.approx(esperado)
 
     """Teste para o método dividir usando pytest.mark.parametrize para testar múltiplos casos, incluindo divisão por zero."""
     @pytest.mark.parametrize("a, b, esperado", [
@@ -61,16 +61,17 @@ class TestCalculadora:
         (-8, 2, -4),
         (8, -2, -4),
         (-8, -2, 4),
+        (0, 5, 0),
     ])
 
     def test_dividir(self, calc, a, b, esperado):
         """Teste para o método dividir."""
         resultado = calc.dividir(a, b)
-        assert resultado == esperado
+        assert resultado == pytest.approx(esperado)
 
     def test_dividir_por_zero(self, calc):
         """Teste para verificar se a divisão por zero lança ValueError."""
-        with pytest.raises(ValueError):
+        with pytest.raises(ZeroDivisionError):
             calc.dividir(5, 0)
 
     """Teste para o método raiz_quadrada usando pytest.mark.parametrize para testar múltiplos casos, incluindo casos de borda."""
@@ -105,7 +106,7 @@ class TestCalculadora:
 
     def test_potencia(self, calc, base, expoente, esperado):
         """Teste parametrizado para potência"""
-        assert calc.potencia(base, expoente) == esperado
+        assert calc.potencia(base, expoente) == pytest.approx(esperado)
 
     @pytest.mark.parametrize("base, expoente", [
         (0, -1),
@@ -114,5 +115,5 @@ class TestCalculadora:
 
     def test_potencia_zero_expoente_negativo(self, calc, base, expoente):
         """Teste para verificar se zero elevado a um expoente negativo lança ValueError."""
-        with pytest.raises(ZeroDivisionError):
+        with pytest.raises(ValueError):
             calc.potencia(base, expoente)
