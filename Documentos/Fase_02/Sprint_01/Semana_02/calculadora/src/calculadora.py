@@ -19,3 +19,9 @@ class Calculadora:
         if b == 0:
             raise ValueError("Divisão por zero não é permitida.")
         return a / b
+
+    def raiz_quadrada(self, a):
+        """Retorna a raiz quadrada de a. Lança ValueError se a for negativo."""
+        if a < 0:
+            raise ValueError("Raiz quadrada de número negativo não é permitida.")
+        return math.sqrt(a)
