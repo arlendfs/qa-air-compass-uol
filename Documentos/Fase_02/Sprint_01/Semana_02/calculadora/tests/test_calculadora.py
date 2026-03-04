@@ -61,15 +61,14 @@ class TestCalculadora:
         (-8, 2, -4),
         (8, -2, -4),
         (-8, -2, 4),
-        (0, 5, 0),
-        (5, 0, None)
     ])
 
     def test_dividir(self, calc, a, b, esperado):
         """Teste para o método dividir."""
-        if b == 0:
-            with pytest.raises(ZeroDivisionError):
-                calc.dividir(a, b)
-        else:
-            resultado = calc.dividir(a, b)
-            assert resultado == esperado
+        resultado = calc.dividir(a, b)
+        assert resultado == esperado
+
+    def test_dividir_por_zero(self, calc):
+        """Teste para verificar se a divisão por zero lança ValueError."""
+        with pytest.raises(ValueError, match="Divisão por zero não é permitida."):
+            calc.dividir(5, 0)
