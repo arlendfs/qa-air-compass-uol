@@ -33,7 +33,6 @@ Cada Sprint contém as respectivas semanas e seus entregáveis, tais como:
 * **Challenges** & Apresentações
 
 Essa estrutura garante clareza histórica e facilita a avaliação da progressão das atividades realizadas.
----
 
 ## 🚀 Fase 02 – Testes Automatizados com Python (TDD)
 
