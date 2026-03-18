@@ -8,5 +8,5 @@ Fazer Login
     [Documentation]    Realiza login com as credenciais fornecidas
     [Arguments]    ${email}=${ADMIN_EMAIL}    ${password}=${ADMIN_PASSWORD}
     &{body}    Create Dictionary    email=${email}    password=${password}
-    ${res}    POST On Session    serverest    /login    json=${body}    verify=${VERIFY_SSL}
+    ${res}    POST On Session    serverest    /login    json=${body}    expected_status=ANY    verify=${VERIFY_SSL}
     RETURN    ${res}

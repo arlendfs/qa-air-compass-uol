@@ -7,7 +7,7 @@ Library    RequestsLibrary
 
 
 *** Variables ***
-${BASE_URL}          https://serverest.dev
+${BASE_URL}          https://compassuol.serverest.dev
 ${USER_NAME}         arlen_qa
 ${ADMIN_EMAIL}       fulano@qa.com
 ${ADMIN_PASSWORD}    teste

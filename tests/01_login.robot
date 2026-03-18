@@ -11,3 +11,10 @@ CT-01: Login Com Credenciais Válidas
     ${res}    Fazer Login    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
     Should Be Equal As Integers    ${res.status_code}    200
     Dictionary Should Contain Key    ${res.json()}    authorization
+
+CT-02: Login Com Senha Inválida
+    [Documentation]    Verifica se o login falha com uma senha inválida
+    ${res}    Fazer Login    ${ADMIN_EMAIL}    senha_incorreta
+    Should Be Equal As Integers    ${res.status_code}    401    ${res}
+    Dictionary Should Contain Key    ${res.json()}    message
+    Should Be Equal As Strings    ${res.json()['message']}    Email e/ou senha inválidos
