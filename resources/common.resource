@@ -1,4 +1,5 @@
 *** Settings ***
+Documentation   Recursos comuns para os testes da API ServeRest
 Library    Collections
 Library    String
 Library    SeleniumLibrary
