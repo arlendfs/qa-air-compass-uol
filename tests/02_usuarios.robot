@@ -12,3 +12,11 @@ CT-04: Cadastrar Novo Usuário Administrador Com Sucesso
     Should Be Equal As Integers    ${res.status_code}    201
     Dictionary Should Contain Key    ${res.json()}    message
     Should Be Equal As Strings    ${res.json()['message']}    Cadastro realizado com sucesso
+
+CT-05: Tentar Cadastrar Usuário Com E-mail Já Existente
+    [Documentation]    Verifica se o sistema impede o cadastro de um usuário com email já existente
+    &{body}    Create Dictionary    nome=Arlen    email=beltrano@qa.com    password=teste    administrador=true
+    ${res}    POST On Session    serverest    /usuarios    json=${body}    expected_status=any    verify=${VERIFY_SSL}
+    Status Should Be    400    ${res}
+    Should Be Equal As Strings    ${res.json()['message']}    Este email já está sendo usado
+
