@@ -27,3 +27,11 @@ Gerar Nome de Produto Único
     ${nome}    Set Variable    Produto Teste ${aleatorio}
     Log    Nome de produto gerado: ${nome}
     RETURN    ${nome}
+
+Validar Campos Produto
+    [Documentation]    Valida os campos obrigatórios de um produto
+    [Arguments]    ${produto}
+    Dictionary Should Contain Key    ${produto}    nome
+    Dictionary Should Contain Key    ${produto}    preco
+    Dictionary Should Contain Key    ${produto}    descricao
+    Dictionary Should Contain Key    ${produto}    quantidade

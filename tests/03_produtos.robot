@@ -31,3 +31,14 @@ CT-08: Tentar Cadastrar Produto Com Nome Duplicado
     Status Should Be    400    ${res}
     Dictionary Should Contain Key    ${res.json()}    message
     Should Be Equal As Strings    ${res.json()['message']}    Já existe produto com esse nome
+
+CT-09: Listar Todos Produtos E Validar Produto Cadastrado
+    [Documentation]    Verifica se é possível listar todos os produtos e validar o produto cadastrado
+    ${res}    Listar Todos Produtos
+    Status Should Be    200    ${res}
+    Dictionary Should Contain Key    ${res.json()}    produtos
+    Dictionary Should Contain Key    ${res.json()}    quantidade
+    ${produtos}    Get From Dictionary    ${res.json()}    produtos
+    ${produto_encontrado}    Get Length    ${produtos}
+    Run Keyword If    ${produto_encontrado} > 0   Validar Campos Produto    ${produtos}[0]
+    ...    ELSE    Log    Nenhum produto encontrado para validar contrato
