@@ -20,3 +20,14 @@ CT-05: Tentar Cadastrar Usuário Com E-mail Já Existente
     Status Should Be    400    ${res}
     Should Be Equal As Strings    ${res.json()['message']}    Este email já está sendo usado
 
+CT-06: Buscar Usuário por ID E Validar Campos Obrigatórios
+    [Documentation]    Verifica se é possível buscar um usuário por ID e validar os campos obrigatórios
+    ${email}    Gerar Email Aleatório
+    ${res_cadastro}    Cadastrar Usuário   ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
+    Should Be Equal As Integers    ${res_cadastro.status_code}    201
+    ${user_id}    Get From Dictionary    ${res_cadastro.json()}    _id
+    ${res_busca}    Pesquisar Usuário Por ID   ${user_id}
+    Should Be Equal As Integers    ${res_busca.status_code}    200
+    Dictionary Should Contain Key    ${res_busca.json()}    nome
+    Dictionary Should Contain Key    ${res_busca.json()}    email
+    
