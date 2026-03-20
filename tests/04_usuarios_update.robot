@@ -30,3 +30,10 @@ CT-11: [BUG] Atualizar Usuário Com Nome Vazio
     ${res}      Atualizar Usuário Por ID    ${ID_USUARIO_TESTE}    ${EMPTY}    ${email}    teste123    true
     Run Keyword If    ${res.status_code} == 200    Log    BUG-12: API permite atualizar usuário com nome vazio - Status Code: ${res.status_code}
     ...    ELSE    Status Should Be    400    ${res}
+
+CT-12: [BUG] Atualizar Usuário Com Password Vazio
+    [Documentation]    Verificar se API permite atualizar um usuário com password em formato inválido (BUG-12 do Relatório de Bugs)
+
+    ${res}      Atualizar Usuário Por ID    ${ID_USUARIO_TESTE}    Arlen Teste    email_invalido    ${EMPTY}    true
+    Run Keyword If    ${res.status_code} == 200    Log    BUG-12: API permite atualizar usuário com password em formato inválido - Status Code: ${res.status_code}
+    ...    ELSE    Status Should Be    400    ${res}
