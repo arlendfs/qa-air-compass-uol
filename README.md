@@ -15,14 +15,14 @@ Challenge_03/
   |--- resourcers/   
         - login_page.resource
         - users_page.resource
-        - prod-page.resource
-        - cart-page.resource
+        - prod_page.resource
+        - users_update_page.resource
   |--- common.resource
   |--- tests/
         - 01_login.robot
         - 02_usuarios.robot
         - 03_produtos.robot
-        - 04_carrinho.robot
+        - 04_usuarios_update.robot
   |--- .gitignore
   README.md
   requirements.txt
@@ -53,7 +53,7 @@ Instale as dependêncies:
 Execute a suíte completa:
 
 ```bash
-  robot -d ./logs tests/
+  robot -d ./logs ./tests
 ```
 
 
