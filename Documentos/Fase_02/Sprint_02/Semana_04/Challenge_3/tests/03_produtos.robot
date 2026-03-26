@@ -5,10 +5,12 @@ Resource    ../resources/prod_page.resource
 Suite Setup    Criar Sessão ServeRest
 Suite Teardown    Log    Testes de Produtos Concluídos
 
+
 *** Variables ***
 ${TOKEN_ADMIN}    ${EMPTY}
 ${ID_PRODUTO}    ${EMPTY}
 ${NOME_PRODUTO}    ${EMPTY}
+
 
 *** Test Cases ***
 CT-07: Cadastrar Novo Produto Com Sucesso
