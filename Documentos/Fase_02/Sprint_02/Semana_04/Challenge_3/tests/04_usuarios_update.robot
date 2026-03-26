@@ -5,10 +5,11 @@ Resource    ../resources/users_update_page.resource
 Suite Setup    Criar Sessão ServeRest E Criar Usuario Teste
 Suite Teardown       Limpar Usuario Teste
 
+
 *** Test Cases ***
 CT-10: Atualizar Usuário Com Sucesso
     [Documentation]    Validar atualização de um usuário com dados válidos
-    
+
     ${novo_nome}    Set Variable    Arlen Atualizado
     ${novo_email}    Gerar Email Aleatório
     ${nova_senha}    Set Variable    teste123
