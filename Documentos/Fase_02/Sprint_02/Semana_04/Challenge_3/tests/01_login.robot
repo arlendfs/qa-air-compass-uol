@@ -1,27 +1,41 @@
 *** Settings ***
-Documentation   Testes de Login para a API ServeRest
+Documentation    Suite de testes de Login — valida fluxos positivo e negativos do endpoint POST /login.
 Resource    ../resources/common.resource
 Resource    ../resources/login_page.resource
-Suite Setup    Criar Sessão ServeRest
+Suite Setup      Criar Sessão ServeRest
+Suite Teardown   Delete All Sessions
 
 
 *** Test Cases ***
 CT-01: Login Com Credenciais Válidas
-    [Documentation]    Verifica se o login é bem-sucedido com credenciais válidas
-    ${res}    Fazer Login    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
-    Should Be Equal As Integers    ${res.status_code}    200
-    Dictionary Should Contain Key    ${res.json()}    authorization
+    [Documentation]    Dado credenciais válidas, o login deve retornar 200 e um token de autorização.
+    [Tags]    login    positivo
+    Given Que A Sessão ServeRest Está Ativa
+    When Realizo Login Com    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
+    Then Então O Login Deve Ser Bem-Sucedido    ${res}
 
 CT-02: Login Com Senha Inválida
-    [Documentation]    Verifica se o login falha com uma senha inválida
-    ${res}    Fazer Login    ${ADMIN_EMAIL}    senha_incorreta
-    Should Be Equal As Integers    ${res.status_code}    401    ${res}
-    Dictionary Should Contain Key    ${res.json()}    message
-    Should Be Equal As Strings    ${res.json()['message']}    Email e/ou senha inválidos
+    [Documentation]    Dado uma senha incorreta, o login deve retornar 401 com mensagem de erro.
+    [Tags]    login    negativo
+    Given Que A Sessão ServeRest Está Ativa
+    When Realizo Login Com    ${ADMIN_EMAIL}    senha_incorreta
+    Then Então O Login Deve Falhar Com Status    ${res}    401    Email e/ou senha inválidos
 
-CT-03: Login Com Email Com Formato Inválido
-    [Documentation]    Verifica se o login falha com um email em formato Inválido
-    ${res}    Fazer Login    email_Inválido    ${ADMIN_PASSWORD}
-    Should Be Equal As Integers    ${res.status_code}    400    ${res}
-    Dictionary Should Contain Key    ${res.json()}    email
-    Should Be Equal As Strings    ${res.json()['email']}    email deve ser um email válido
+CT-03: Login Com Email Em Formato Inválido
+    [Documentation]    Dado um email sem formato válido, o login deve retornar 400 com mensagem de validação.
+    [Tags]    login    negativo
+    Given Que A Sessão ServeRest Está Ativa
+    When Realizo Login Com    email_invalido    ${ADMIN_PASSWORD}
+    Then Então O Login Deve Falhar Com Status    ${res}    400    email deve ser um email válido    email
+
+
+*** Keywords ***
+# Alias Given para tornar os test cases legíveis sem duplicar lógica
+Que A Sessão ServeRest Está Ativa
+    Log    Sessão ServeRest ativa.
+
+# Sobrescreve o retorno de "Quando Realizo Login Com" na variável ${res} para uso no Then
+When Realizo Login Com
+    [Arguments]    ${email}    ${password}
+    ${res}    Quando Realizo Login Com    ${email}    ${password}
+    Set Test Variable    ${res}
