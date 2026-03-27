@@ -1,33 +1,28 @@
 *** Settings ***
+Documentation    Suite de testes de Usuários — fluxos de criação e busca no endpoint /usuarios.
 Resource    ../resources/common.resource
 Resource    ../resources/users_page.resource
-Suite Setup    Criar Sessão ServeRest
+Suite Setup      Criar Sessão ServeRest
+Suite Teardown   Delete All Sessions
 
 
 *** Test Cases ***
 CT-04: Cadastrar Novo Usuário Administrador Com Sucesso
-    [Documentation]    Verifica se é possível cadastrar um novo usuário administrador com dados válidos
-    ${email}    Gerar Email Aleatório
-    ${res}      Cadastrar Usuário   ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
-    Should Be Equal As Integers    ${res.status_code}    201
-    Dictionary Should Contain Key    ${res.json()}    message
-    Should Be Equal As Strings    ${res.json()['message']}    Cadastro realizado com sucesso
+    [Documentation]    Um novo usuário com dados válidos deve ser cadastrado com sucesso.
+    [Tags]    usuarios    positivo    smoke
+    Quando Cadastro Um Novo Usuário
+    Então O Cadastro De Usuário Deve Ter Sucesso
 
 CT-05: Tentar Cadastrar Usuário Com E-mail Já Existente
-    [Documentation]    Verifica se o sistema impede o cadastro de um usuário com email já existente
-    &{body}    Create Dictionary    nome=Arlen    email=beltrano@qa.com    password=teste    administrador=true
-    ${res}    POST On Session    serverest    /usuarios    json=${body}    expected_status=any    verify=${VERIFY_SSL}
-    Status Should Be    400    ${res}
-    Should Be Equal As Strings    ${res.json()['message']}    Este email já está sendo usado
+    [Documentation]    Tentar cadastrar com email já existente deve retornar erro de conflito.
+    [Tags]    usuarios    negativo
+    Dado Que Existe Um Usuário Cadastrado
+    Quando Tento Cadastrar Um Usuário Com Email Já Existente
+    Então O Cadastro De Usuário Deve Falhar Com    Este email já está sendo usado
 
-CT-06: Buscar Usuário por ID E Validar Campos Obrigatórios
-    [Documentation]    Verifica se é possível buscar um usuário por ID e validar os campos obrigatórios
-    ${email}    Gerar Email Aleatório
-    ${res_cadastro}    Cadastrar Usuário   ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
-    Should Be Equal As Integers    ${res_cadastro.status_code}    201
-    ${user_id}    Get From Dictionary    ${res_cadastro.json()}    _id
-    ${res_busca}    Pesquisar Usuário Por ID   ${user_id}
-    Should Be Equal As Integers    ${res_busca.status_code}    200
-    Dictionary Should Contain Key    ${res_busca.json()}    nome
-    Dictionary Should Contain Key    ${res_busca.json()}    email
-    
+CT-06: Buscar Usuário Por ID E Validar Campos Obrigatórios
+    [Documentation]    Um usuário cadastrado deve ser encontrado por ID com todos os campos do contrato.
+    [Tags]    usuarios    positivo    contrato
+    Dado Que Existe Um Usuário Cadastrado
+    Quando Busco O Usuário Por ID
+    Então Os Dados Do Usuário Devem Estar Corretos
