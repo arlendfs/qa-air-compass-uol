@@ -50,5 +50,7 @@ Validar Resposta Da API
     [Documentation]    Asserção genérica reutilizável: valida status code e mensagem da resposta.
     # Evita repetir Should Be Equal As Integers + Should Be Equal As Strings em todo test case.
     [Arguments]    ${res}    ${status_esperado}    ${mensagem_esperada}    ${campo}=message
+    # ${campo} extraído antes da asserção — interpolação dentro de ['...'] não é expandida pelo RF.
+    ${valor}    Get From Dictionary    ${res.json()}    ${campo}
     Should Be Equal As Integers    ${res.status_code}    ${status_esperado}
-    Should Be Equal As Strings     ${res.json()['${campo}']}    ${mensagem_esperada}
+    Should Be Equal As Strings     ${valor}    ${mensagem_esperada}
