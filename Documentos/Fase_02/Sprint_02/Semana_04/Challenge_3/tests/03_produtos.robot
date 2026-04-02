@@ -1,37 +1,38 @@
 *** Settings ***
-Documentation    Suite de testes de Produtos — fluxos de criação e listagem no endpoint /produtos.
+Documentation    Products suite — create and list flows for /produtos endpoint.
 Resource    ../resources/common.resource
 Resource    ../resources/prod_page.resource
-Suite Setup      Inicializar Suite De Produtos
+Resource    ../utils/logger.resource
+Suite Setup      Products Suite Setup
 Suite Teardown   Delete All Sessions
+Test Tags        produtos    regression
 
 
 *** Test Cases ***
 CT-07: Cadastrar Novo Produto Com Sucesso
-    [Documentation]    Um produto com dados válidos e nome único deve ser cadastrado com sucesso.
-    [Tags]    produtos    positivo    smoke
-    Quando Cadastro Um Novo Produto    ${TOKEN_ADMIN}
+    [Documentation]    A product with valid data and a unique name must be registered successfully.
+    [Tags]    smoke    critical    positivo
+    Log Step    CT-07    Create new product
+    Quando Cadastro Um Novo Produto    ${TOKEN}
     Então O Cadastro De Produto Deve Ter Sucesso
 
 CT-08: Tentar Cadastrar Produto Com Nome Duplicado
-    [Documentation]    Tentar cadastrar com nome já existente deve retornar erro de conflito.
-    [Tags]    produtos    negativo
-    Dado Que Existe Um Produto Cadastrado    ${TOKEN_ADMIN}
-    Quando Tento Cadastrar Um Produto Com Nome Já Existente    ${TOKEN_ADMIN}
+    [Documentation]    Registering with a duplicate name must return a 400 conflict error.
+    [Tags]    negativo
+    Log Step    CT-08    Duplicate product name conflict
+    Dado Que Existe Um Produto Cadastrado    ${TOKEN}
+    Quando Tento Cadastrar Um Produto Com Nome Já Existente    ${TOKEN}
     Então O Cadastro De Produto Deve Falhar Com    Já existe produto com esse nome
 
 CT-09: Listar Todos Os Produtos E Validar Contrato
-    [Documentation]    A listagem deve retornar 200 e os produtos devem conter os campos obrigatórios.
-    [Tags]    produtos    positivo    contrato
+    [Documentation]    The listing must return 200 and products must contain all mandatory fields.
+    [Tags]    positivo    contrato
+    Log Step    CT-09    List all products and validate contract
     Quando Listo Todos Os Produtos
     Então A Listagem De Produtos Deve Estar Correta
 
 
 *** Keywords ***
-Inicializar Suite De Produtos
-    [Documentation]    Cria sessão e obtém token de admin. Expõe ${TOKEN_ADMIN} para toda a suite.
-    # Keyword de setup mantida no arquivo de teste pois é específica desta suite.
-    # Resources de página não devem conhecer o ciclo de vida da suite.
-    Criar Sessão ServeRest
-    ${token}    Pegar Token de Autenticação
-    Set Suite Variable    ${TOKEN_ADMIN}    ${token}
+Products Suite Setup
+    Log Suite Banner    Products Suite — /produtos
+    Create Authenticated Session

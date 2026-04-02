@@ -1,74 +1,48 @@
 *** Settings ***
-Documentation    Keywords de usuários — camadas Given/When/Then para o endpoint /usuarios.
+Documentation    User keywords — Gherkin Given/When/Then for /usuarios endpoint.
 Resource    common.resource
+Resource    ../services/user_service.resource
 
 
 *** Keywords ***
-# ── Dado (Given) — pré-condições e estado inicial ───────────────────────────
-
 Dado Que Existe Um Usuário Cadastrado
-    [Documentation]    Cria um usuário via API e expõe ${ID_USUARIO} e ${EMAIL_USUARIO} como variáveis de teste.
-    # Usado como pré-condição em cenários que dependem de um usuário já existente (ex: busca, duplicata).
+    [Documentation]    Creates a user via API and exposes ${ID_USUARIO} and ${EMAIL_USUARIO}.
     ${email}    Gerar Email Aleatório
-    ${res}      Cadastrar Usuário    ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
+    ${res}      Create User    ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
     Então O Cadastro De Usuário Deve Ter Sucesso    ${res}
     Set Test Variable    ${ID_USUARIO}     ${res.json()['_id']}
     Set Test Variable    ${EMAIL_USUARIO}  ${email}
 
-# ── Quando (When) — ações sobre o endpoint ──────────────────────────────────
-
 Quando Cadastro Um Novo Usuário
-    [Documentation]    Envia POST /usuarios com dados válidos e únicos.
-    # Email gerado dinamicamente — elimina dependência de dados fixos no ambiente.
+    [Documentation]    Sends POST /usuarios with valid unique data.
     ${email}    Gerar Email Aleatório
-    ${res}      Cadastrar Usuário    ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
+    ${res}      Create User    ${USER_NAME}    ${email}    ${ADMIN_PASSWORD}
     Set Test Variable    ${RESPOSTA_USUARIO}    ${res}
 
 Quando Tento Cadastrar Um Usuário Com Email Já Existente
-    [Documentation]    Reutiliza o email de um usuário já criado para forçar conflito 400.
-    # Depende de "Dado Que Existe Um Usuário Cadastrado" ter sido executado antes.
-    ${res}    Cadastrar Usuário    ${USER_NAME}    ${EMAIL_USUARIO}    ${ADMIN_PASSWORD}
+    [Documentation]    Reuses an existing email to force a 400 conflict.
+    ${res}    Create User    ${USER_NAME}    ${EMAIL_USUARIO}    ${ADMIN_PASSWORD}
     Set Test Variable    ${RESPOSTA_USUARIO}    ${res}
 
 Quando Busco O Usuário Por ID
-    [Documentation]    Envia GET /usuarios/{id} usando o ID exposto pelo Given.
-    ${res}    Pesquisar Usuário Por ID    ${ID_USUARIO}
+    [Documentation]    Sends GET /usuarios/{id} using the ID exposed by the Given.
+    ${res}    Get User By ID    ${ID_USUARIO}
     Set Test Variable    ${RESPOSTA_USUARIO}    ${res}
 
-# ── Então (Then) — asserções de resultado ───────────────────────────────────
-
 Então O Cadastro De Usuário Deve Ter Sucesso
-    [Documentation]    Valida status 201 e mensagem de sucesso no cadastro.
+    [Documentation]    Asserts status 201 and success message.
     [Arguments]    ${res}=${RESPOSTA_USUARIO}
     Validar Resposta Da API    ${res}    201    Cadastro realizado com sucesso
 
 Então O Cadastro De Usuário Deve Falhar Com
-    [Documentation]    Valida status 400 e a mensagem de erro esperada.
+    [Documentation]    Asserts status 400 and the expected error message.
     [Arguments]    ${mensagem_esperada}    ${res}=${RESPOSTA_USUARIO}
     Validar Resposta Da API    ${res}    400    ${mensagem_esperada}
 
 Então Os Dados Do Usuário Devem Estar Corretos
-    [Documentation]    Valida status 200 e presença dos campos obrigatórios do contrato /usuarios/{id}.
+    [Documentation]    Asserts status 200 and presence of mandatory contract fields.
     [Arguments]    ${res}=${RESPOSTA_USUARIO}
     Should Be Equal As Integers    ${res.status_code}    200
     Dictionary Should Contain Key    ${res.json()}    nome
     Dictionary Should Contain Key    ${res.json()}    email
     Dictionary Should Contain Key    ${res.json()}    administrador
-
-# ── Primitivas (baixo nível) — chamadas HTTP diretas ────────────────────────
-
-Cadastrar Usuário
-    [Documentation]    Primitiva HTTP: POST /usuarios. Usada pelas keywords Gherkin acima.
-    [Arguments]    ${nome}    ${email}    ${password}    ${administrador}=${ADMINISTRADOR}
-    &{body}    Create Dictionary    nome=${nome}    email=${email}
-    ...    password=${password}    administrador=${administrador}
-    ${res}    POST On Session    serverest    /usuarios    json=${body}
-    ...    expected_status=any    verify=${VERIFY_SSL}
-    RETURN    ${res}
-
-Pesquisar Usuário Por ID
-    [Documentation]    Primitiva HTTP: GET /usuarios/{id}. Usada pelas keywords Gherkin acima.
-    [Arguments]    ${user_id}
-    ${res}    GET On Session    serverest    /usuarios/${user_id}
-    ...    expected_status=any    verify=${VERIFY_SSL}
-    RETURN    ${res}

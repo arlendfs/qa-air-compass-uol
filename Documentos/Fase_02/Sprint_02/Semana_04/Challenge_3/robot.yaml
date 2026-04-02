@@ -1,0 +1,76 @@
+# robot.yaml — Named execution profiles for Robot Framework
+# Usage: robot --argumentfile robot.yaml:<profile> tests/
+# Or directly: robot $(cat robot.yaml | python -c "import sys,yaml; p=yaml.safe_load(sys.stdin); print(' '.join(p['profiles']['smoke']))" ) tests/
+
+profiles:
+
+  # Run only smoke-tagged tests — fastest feedback loop (~30s)
+  smoke:
+    - --include
+    - smoke
+    - --outputdir
+    - logs/smoke
+    - --loglevel
+    - INFO
+
+  # Full regression excluding performance — used on PRs (~3 min)
+  regression:
+    - --include
+    - regression
+    - --exclude
+    - performance
+    - --outputdir
+    - logs/regression
+    - --loglevel
+    - INFO
+
+  # Security-only run
+  security:
+    - --include
+    - security
+    - --outputdir
+    - logs/security
+    - --loglevel
+    - DEBUG
+
+  # Performance suite with overridable SLA thresholds
+  performance:
+    - --include
+    - performance
+    - --variable
+    - SLA_FAST:500
+    - --variable
+    - SLA_NORMAL:1000
+    - --variable
+    - SLA_SLOW:2000
+    - --outputdir
+    - logs/performance
+    - --loglevel
+    - INFO
+
+  # Critical path only — used as a pre-deploy gate
+  critical:
+    - --include
+    - critical
+    - --outputdir
+    - logs/critical
+    - --loglevel
+    - INFO
+
+  # Contract validation only
+  contract:
+    - --include
+    - contrato
+    - --include
+    - schema
+    - --outputdir
+    - logs/contract
+    - --loglevel
+    - DEBUG
+
+  # Full suite — nightly run
+  full:
+    - --outputdir
+    - logs/full
+    - --loglevel
+    - INFO

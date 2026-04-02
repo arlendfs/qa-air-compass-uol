@@ -1,7 +1,22 @@
-# Robot Framework
+# Robot Framework artifacts
 output.xml
 log.html
 report.html
 logs/
+
+# Python
 venv/
+.venv/
 __pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

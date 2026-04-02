@@ -1,0 +1,52 @@
+{
+  "valid": {
+    "preco": 99,
+    "descricao": "Produto de teste automatizado",
+    "quantidade": 10
+  },
+  "zero_price": {
+    "preco": 0,
+    "descricao": "Produto com preco zero",
+    "quantidade": 5,
+    "expected_status": 400,
+    "expected_field": "preco",
+    "expected_message": "preco deve ser um número positivo"
+  },
+  "negative_price": {
+    "preco": -1,
+    "descricao": "Produto com preco negativo",
+    "quantidade": 5,
+    "expected_status": 400,
+    "expected_field": "preco",
+    "expected_message": "preco deve ser um número positivo"
+  },
+  "zero_quantity": {
+    "preco": 50,
+    "descricao": "Produto sem estoque",
+    "quantidade": 0,
+    "expected_status": 201,
+    "note": "ServeRest accepts quantity 0 — documents actual API behavior"
+  },
+  "negative_quantity": {
+    "preco": 50,
+    "descricao": "Produto com quantidade negativa",
+    "quantidade": -1,
+    "expected_status": 400,
+    "expected_field": "quantidade",
+    "expected_message": "quantidade deve ser maior ou igual a 1"
+  },
+  "missing_name": {
+    "nome": "",
+    "preco": 50,
+    "descricao": "Produto sem nome",
+    "quantidade": 5,
+    "expected_status": 400,
+    "expected_field": "nome",
+    "expected_message": "nome não pode ficar em branco"
+  },
+  "xss_payload_name": {
+    "preco": 10,
+    "descricao": "Produto XSS",
+    "quantidade": 1
+  }
+}

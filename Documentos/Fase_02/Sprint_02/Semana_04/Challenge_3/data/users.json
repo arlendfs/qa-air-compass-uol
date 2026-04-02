@@ -1,0 +1,52 @@
+{
+  "valid_admin": {
+    "nome": "Arlen Admin",
+    "password": "teste123",
+    "administrador": "true"
+  },
+  "valid_non_admin": {
+    "nome": "Arlen User",
+    "password": "teste123",
+    "administrador": "false"
+  },
+  "missing_name": {
+    "nome": "",
+    "password": "teste123",
+    "administrador": "true",
+    "expected_status": 400,
+    "expected_field": "nome",
+    "expected_message": "nome não pode ficar em branco"
+  },
+  "missing_password": {
+    "nome": "Arlen Sem Senha",
+    "password": "",
+    "administrador": "true",
+    "expected_status": 400,
+    "expected_field": "password",
+    "expected_message": "password não pode ficar em branco"
+  },
+  "invalid_email_format": {
+    "nome": "Arlen Email Inválido",
+    "email": "not-an-email",
+    "password": "teste123",
+    "administrador": "true",
+    "expected_status": 400,
+    "expected_field": "email",
+    "expected_message": "email deve ser um email válido"
+  },
+  "name_max_boundary": {
+    "nome": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "password": "teste123",
+    "administrador": "false"
+  },
+  "sql_injection_name": {
+    "nome": "'; DROP TABLE usuarios; --",
+    "password": "teste123",
+    "administrador": "false"
+  },
+  "xss_payload_name": {
+    "nome": "<script>alert('xss')</script>",
+    "password": "teste123",
+    "administrador": "false"
+  }
+}

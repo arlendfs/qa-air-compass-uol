@@ -1,0 +1,43 @@
+{
+  "valid": {
+    "email": "fulano@qa.com",
+    "password": "teste"
+  },
+  "invalid_password": {
+    "email": "fulano@qa.com",
+    "password": "wrong_password",
+    "expected_status": 401,
+    "expected_message": "Email e/ou senha inválidos"
+  },
+  "invalid_email_format": {
+    "email": "not-an-email",
+    "password": "teste",
+    "expected_status": 400,
+    "expected_field": "email",
+    "expected_message": "email deve ser um email válido"
+  },
+  "empty_email": {
+    "email": "",
+    "password": "teste",
+    "expected_status": 400,
+    "expected_field": "email",
+    "expected_message": "email não pode ficar em branco"
+  },
+  "empty_password": {
+    "email": "fulano@qa.com",
+    "password": "",
+    "expected_status": 400,
+    "expected_field": "password",
+    "expected_message": "password não pode ficar em branco"
+  },
+  "sql_injection": {
+    "email": "' OR '1'='1",
+    "password": "' OR '1'='1",
+    "expected_status": 400
+  },
+  "xss_payload": {
+    "email": "<script>alert(1)</script>@test.com",
+    "password": "teste",
+    "expected_status": 400
+  }
+}

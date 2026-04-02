@@ -1,30 +1,22 @@
 *** Settings ***
-Documentation    Keywords de login: ações e asserções separadas seguindo o padrão Gherkin.
+Documentation    Login keywords — Gherkin actions and assertions for POST /login.
 Resource    common.resource
+Resource    ../services/auth_service.resource
 
 
 *** Keywords ***
-# ── Ações (When) ────────────────────────────────────────────────────────────
-
 Quando Realizo Login Com
-    [Documentation]    Envia a requisição POST /login com as credenciais fornecidas.
+    [Documentation]    Sends POST /login and stores the response in ${res}.
     [Arguments]    ${email}    ${password}
-    &{body}    Create Dictionary    email=${email}    password=${password}
-    ${res}    POST On Session    serverest    /login    json=${body}
-    ...    expected_status=any    verify=${VERIFY_SSL}
-    RETURN    ${res}
-
-# ── Asserções (Then) ─────────────────────────────────────────────────────────
+    ${res}    Login User    ${email}    ${password}
+    Set Test Variable    ${res}
 
 Então O Login Deve Ser Bem-Sucedido
-    [Documentation]    Valida status 200 e presença do token na resposta.
-    [Arguments]    ${res}
+    [Documentation]    Asserts status 200 and presence of the token in the response.
     Should Be Equal As Integers    ${res.status_code}    200
     Dictionary Should Contain Key    ${res.json()}    authorization
 
 Então O Login Deve Falhar Com Status
-    [Documentation]    Valida status de erro e a mensagem retornada pela API.
-    [Arguments]    ${res}    ${status_esperado}    ${mensagem_esperada}    ${campo}=message
-    Should Be Equal As Integers    ${res.status_code}    ${status_esperado}
-    Dictionary Should Contain Key    ${res.json()}    ${campo}
-    Should Be Equal As Strings    ${res.json()['${campo}']}    ${mensagem_esperada}
+    [Documentation]    Asserts error status and the message returned by the API.
+    [Arguments]    ${status_esperado}    ${mensagem_esperada}    ${campo}=message
+    Validar Resposta Da API    ${res}    ${status_esperado}    ${mensagem_esperada}    ${campo}
