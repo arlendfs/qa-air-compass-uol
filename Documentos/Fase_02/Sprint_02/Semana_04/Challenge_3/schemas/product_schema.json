@@ -1,0 +1,53 @@
+{
+  "schemas": {
+    "post_201": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "POST /produtos — 201 Created",
+      "type": "object",
+      "required": ["message", "_id"],
+      "additionalProperties": false,
+      "properties": {
+        "message": { "type": "string" },
+        "_id":     { "type": "string", "minLength": 1 }
+      }
+    },
+    "get_list_200": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GET /produtos — 200 OK",
+      "type": "object",
+      "required": ["quantidade", "produtos"],
+      "additionalProperties": false,
+      "properties": {
+        "quantidade": { "type": "integer", "minimum": 0 },
+        "produtos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["nome", "preco", "descricao", "quantidade", "_id"],
+            "properties": {
+              "nome":       { "type": "string" },
+              "preco":      { "type": "number" },
+              "descricao":  { "type": "string" },
+              "quantidade": { "type": "integer", "minimum": 0 },
+              "_id":        { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "get_by_id_200": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GET /produtos/{id} — 200 OK",
+      "type": "object",
+      "required": ["nome", "preco", "descricao", "quantidade", "_id"],
+      "additionalProperties": false,
+      "properties": {
+        "nome":       { "type": "string" },
+        "preco":      { "type": "number" },
+        "descricao":  { "type": "string" },
+        "quantidade": { "type": "integer", "minimum": 0 },
+        "_id":        { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
