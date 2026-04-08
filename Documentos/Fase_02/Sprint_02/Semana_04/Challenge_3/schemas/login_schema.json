@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "POST /login — 200 OK",
+  "type": "object",
+  "required": ["message", "authorization"],
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "type": "string"
+    },
+    "authorization": {
+      "type": "string",
+      "pattern": "^Bearer .+"
+    }
+  }
+}
