@@ -57,7 +57,7 @@ Quando Tento Finalizar Sem Ter Um Carrinho
     # A ServeRest retorna 200 (não 404) com mensagem de "não encontrado" nesta rota.
     ${email}       Gerar Email Aleatório
     &{body_user}   Create Dictionary
-    ...    nome=User Isolado CT16    email=${email}    password=teste123    administrador=false
+    ...    nome=User Isolado CT29    email=${email}    password=teste123    administrador=false
     POST On Session    serverest    /usuarios    json=${body_user}
     ...    expected_status=any    verify=${VERIFY_SSL}
     ${token_isolado}    Pegar Token de Autenticação    ${email}    teste123
@@ -65,13 +65,53 @@ Quando Tento Finalizar Sem Ter Um Carrinho
     Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
 
 Quando Tento Adicionar Um Produto Com ID Inválido
-    [Documentation]    Tenta criar carrinho com ID de produto inexistente para forçar erro 400.
+    [Documentation]    Tenta criar carrinho com ID de produto malformado para forçar erro 400.
     ${res}    Criar Carrinho    ${TOKEN}    id_produto_invalido_xyz    1
+    Log    [CT-30 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
     Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
 
 Quando Busco O Carrinho Por ID
     [Documentation]    Envia GET /carrinhos/{id} usando o ID exposto pelo Given.
     ${res}    Buscar Carrinho Por ID    ${ID_CARRINHO}
+    Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
+
+Quando Tento Adicionar Produto Sem Estoque
+    [Documentation]    Cria produto com quantidade=0 e tenta adicioná-lo ao carrinho — força erro 400.
+    # ServeRest rejeita adição de produto sem estoque disponível.
+    ${nome}        Gerar Nome Único    prefixo=Produto Sem Estoque
+    ${res_prod}    Cadastrar Produto    ${nome}    100    Produto sem estoque    0    ${TOKEN}
+    Should Be Equal As Integers    ${res_prod.status_code}    201
+    ${id_sem_estoque}    Set Variable    ${res_prod.json()['_id']}
+    ${res}    Criar Carrinho    ${TOKEN}    ${id_sem_estoque}    1
+    Log    [CT-32 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
+    Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
+
+Quando Tento Cancelar Sem Ter Um Carrinho
+    [Documentation]    Tenta cancelar compra sem carrinho ativo usando usuário isolado.
+    # ServeRest retorna 200 com mensagem "não encontrado" também no cancelar — mesmo comportamento do concluir.
+    ${email}       Gerar Email Aleatório
+    &{body_user}   Create Dictionary
+    ...    nome=User Isolado CT34    email=${email}    password=teste123    administrador=false
+    POST On Session    serverest    /usuarios    json=${body_user}
+    ...    expected_status=any    verify=${VERIFY_SSL}
+    ${token_isolado}    Pegar Token de Autenticação    ${email}    teste123
+    ${res}    Cancelar Compra    ${token_isolado}
+    Log    [CT-34 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
+    Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
+
+Quando Tento Adicionar Produto Inexistente
+    [Documentation]    Tenta criar carrinho com ID de formato válido mas inexistente no banco — força erro 400.
+    # Diferente de CT-30 (ID malformado): aqui o ID tem 24 chars hex mas não existe.
+    ${res}    Criar Carrinho    ${TOKEN}    000000000000000000000000    1
+    Log    [CT-35 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
+    Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
+
+Quando Tento Finalizar Compra Sem Autenticação
+    [Documentation]    Envia DELETE /carrinhos/concluir-compra sem token de autorização — força 401.
+    ${headers}    Create Dictionary    accept=application/json
+    ${res}    DELETE On Session    serverest    /carrinhos/concluir-compra
+    ...    headers=${headers}    expected_status=any    verify=${VERIFY_SSL}
+    Log    [CT-36 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
     Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
 
 # ── Então (Then) — asserções de resultado ───────────────────────────────────
@@ -97,9 +137,26 @@ Então A Compra Deve Ser Cancelada Com Sucesso
     Should Be Equal As Strings     ${res.json()['message']}    Registro excluído com sucesso. Estoque dos produtos reabastecido
 
 Então A Operação Deve Falhar Com
-    [Documentation]    Valida status de erro e mensagem esperada. Reutilizável para 400, 401 e 404.
+    [Documentation]    Valida status de erro e mensagem esperada. Reutilizável para 400, 401 e 200 com erro.
     [Arguments]    ${status_esperado}    ${mensagem_esperada}    ${res}=${RESPOSTA_CARRINHO}
     Validar Resposta Da API    ${res}    ${status_esperado}    ${mensagem_esperada}
+
+Então O Contrato De Criação De Carrinho Deve Estar Correto
+    [Documentation]    Valida schema completo da resposta 201: campos message e _id com tipos corretos.
+    [Arguments]    ${res}=${RESPOSTA_CARRINHO}
+    Should Be Equal As Integers    ${res.status_code}    201
+    ${body}    Set Variable    ${res.json()}
+    Dictionary Should Contain Key    ${body}    message
+    Dictionary Should Contain Key    ${body}    _id
+    ${id}    Get From Dictionary    ${body}    _id
+    Should Not Be Empty    ${id}
+    Should Be Equal As Strings    ${body}[message]    Cadastro realizado com sucesso
+
+Então A Operação Deve Retornar Não Autorizado
+    [Documentation]    Valida que a API retornou 401 para requisição sem token de autenticação.
+    [Arguments]    ${res}=${RESPOSTA_CARRINHO}
+    Should Be Equal As Integers    ${res.status_code}    401
+    Log    [DEBUG] Body 401: ${res.text}    DEBUG
 
 Então O Contrato Do Carrinho Deve Estar Correto
     [Documentation]    Valida a estrutura completa do objeto carrinho retornado por GET /carrinhos/{id}.
@@ -107,7 +164,6 @@ Então O Contrato Do Carrinho Deve Estar Correto
     [Arguments]    ${res}=${RESPOSTA_CARRINHO}
     Should Be Equal As Integers    ${res.status_code}    200
     ${carrinho}    Set Variable    ${res.json()}
-    # Campos obrigatórios do envelope
     Dictionary Should Contain Key    ${carrinho}    _id
     Dictionary Should Contain Key    ${carrinho}    idUsuario
     Dictionary Should Contain Key    ${carrinho}    produtos
@@ -115,8 +171,8 @@ Então O Contrato Do Carrinho Deve Estar Correto
     Dictionary Should Contain Key    ${carrinho}    quantidadeTotal
     # Validação de tipos via variáveis intermediárias — Should Be True não expande
     # aspas simples dentro de expressões Python (ex: $dict['key'] quebra o parser do RF).
-    ${preco_total}       Get From Dictionary    ${carrinho}    precoTotal
-    ${qtd_total}         Get From Dictionary    ${carrinho}    quantidadeTotal
+    ${preco_total}    Get From Dictionary    ${carrinho}    precoTotal
+    ${qtd_total}      Get From Dictionary    ${carrinho}    quantidadeTotal
     Should Be True    isinstance($preco_total, (int, float))
     Should Be True    isinstance($qtd_total, (int, float))
     # Validação do contrato do item dentro da lista de produtos
@@ -127,12 +183,10 @@ Então O Contrato Do Carrinho Deve Estar Correto
 Validar Contrato Do Item De Carrinho
     [Documentation]    Valida os campos obrigatórios de cada item dentro da lista produtos do carrinho.
     # Contrato ServeRest por item: idProduto, quantidade, precoUnitario (sem nome/descricao).
-    # Referência: https://serverest.dev/swagger.json?lang=pt-BR#/Carrinhos/get_carrinhos__id
     [Arguments]    ${item}
     Dictionary Should Contain Key    ${item}    idProduto
     Dictionary Should Contain Key    ${item}    quantidade
     Dictionary Should Contain Key    ${item}    precoUnitario
-    # Mesma razão: aspas simples dentro de Should Be True quebram o parser do RF.
     ${qtd_item}    Get From Dictionary    ${item}    quantidade
     ${preco_item}  Get From Dictionary    ${item}    precoUnitario
     Should Be True    isinstance($qtd_item, (int, float))
