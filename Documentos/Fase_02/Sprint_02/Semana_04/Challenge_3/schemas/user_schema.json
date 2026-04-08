@@ -1,0 +1,53 @@
+{
+  "schemas": {
+    "post_201": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "POST /usuarios — 201 Created",
+      "type": "object",
+      "required": ["message", "_id"],
+      "additionalProperties": false,
+      "properties": {
+        "message": { "type": "string" },
+        "_id":     { "type": "string", "minLength": 1 }
+      }
+    },
+    "get_list_200": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GET /usuarios — 200 OK",
+      "type": "object",
+      "required": ["quantidade", "usuarios"],
+      "additionalProperties": false,
+      "properties": {
+        "quantidade": { "type": "integer", "minimum": 0 },
+        "usuarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["nome", "email", "password", "administrador", "_id"],
+            "properties": {
+              "nome":          { "type": "string" },
+              "email":         { "type": "string", "format": "email" },
+              "password":      { "type": "string" },
+              "administrador": { "type": "string", "enum": ["true", "false"] },
+              "_id":           { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "get_by_id_200": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GET /usuarios/{id} — 200 OK",
+      "type": "object",
+      "required": ["nome", "email", "password", "administrador", "_id"],
+      "additionalProperties": false,
+      "properties": {
+        "nome":          { "type": "string" },
+        "email":         { "type": "string", "format": "email" },
+        "password":      { "type": "string" },
+        "administrador": { "type": "string", "enum": ["true", "false"] },
+        "_id":           { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
