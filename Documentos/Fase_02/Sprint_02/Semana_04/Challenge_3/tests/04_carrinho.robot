@@ -107,11 +107,10 @@ CT-36: Finalizar Compra Sem Autenticação
 # ── Setup da suite ────────────────────────────────────────────────────────────
 
 Inicializar Suite De Carrinho
-    [Documentation]    Cria sessão HTTP reutilizável para toda a suite.
-    # Token não é obtido aqui — cada teste chama "Dado Que Estou Autenticado Como Admin"
-    # para manter o escopo do token no nível de teste (Set Test Variable), evitando
-    # que um token expirado em testes longos quebre toda a suite.
+    [Documentation]    Cria sessão HTTP e limpa qualquer carrinho residual do admin antes de iniciar.
+    # Limpeza inicial garante estado limpo mesmo que execução anterior tenha terminado sem teardown.
     Criar Sessão ServeRest
+    Limpar Carrinho Residual Do Admin
 
 # ── Aliases "E Dado Que" para múltiplos Givens legíveis ──────────────────────
 

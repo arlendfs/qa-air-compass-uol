@@ -28,6 +28,8 @@ Pegar Token de Autenticação
     &{body}    Create Dictionary    email=${email}    password=${password}
     ${res}    POST On Session    serverest    /login    json=${body}
     ...    expected_status=any    verify=${VERIFY_SSL}
+    Should Be Equal As Integers    ${res.status_code}    200
+    ...    msg=Falha no login com '${email}' — status: ${res.status_code} | body: ${res.text}. Verifique se o usuário existe no ambiente.
     ${token}    Get From Dictionary    ${res.json()}    authorization
     RETURN    ${token}
 

@@ -195,12 +195,26 @@ Validar Contrato Do Item De Carrinho
 # ── Teardown helpers — limpeza de estado entre testes ───────────────────────
 
 Cancelar Carrinho Se Existir
-    [Documentation]    Tenta cancelar o carrinho ativo. Ignora erro se não houver carrinho.
+    [Documentation]    Tenta cancelar o carrinho ativo. Resiliente quando ${TOKEN} não está definido.
     # Usado como [Teardown] individual nos testes que criam carrinho.
-    # Garante isolamento mesmo quando o teste falha antes do checkout.
+    # ${TOKEN} pode não existir se o teste falhou antes de "Dado Que Estou Autenticado Como Admin".
+    # Nesse caso obtém um token fresco para garantir a limpeza.
+    ${token_definido}    Run Keyword And Return Status    Variable Should Exist    ${TOKEN}
+    IF    not ${token_definido}
+        ${TOKEN}    Pegar Token de Autenticação
+        Set Test Variable    ${TOKEN}
+    END
     ${res}    Cancelar Compra    ${TOKEN}
     Run Keyword If    ${res.status_code} != 200
     ...    Log    Nenhum carrinho ativo para cancelar (status: ${res.status_code}).    DEBUG
+
+Limpar Carrinho Residual Do Admin
+    [Documentation]    Cancela qualquer carrinho ativo do admin antes da suite iniciar.
+    # Garante estado limpo mesmo que a execução anterior tenha terminado sem teardown.
+    # Chamado no Suite Setup — falha silenciosa é esperada quando não há carrinho.
+    ${token}    Pegar Token de Autenticação
+    ${res}      Cancelar Compra    ${token}
+    Log    Limpeza inicial de carrinho residual — Status: ${res.status_code}    DEBUG
 
 # ── Primitivas (baixo nível) — chamadas HTTP diretas ────────────────────────
 
