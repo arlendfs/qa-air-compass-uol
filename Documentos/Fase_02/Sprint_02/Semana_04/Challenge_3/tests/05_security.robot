@@ -8,26 +8,26 @@ Suite Teardown   Delete All Sessions
 
 
 *** Test Cases ***
-CT-40: Acessar /usuarios Sem Token
+CT-SEC-01: Acessar /usuarios Sem Token
     [Documentation]    GET /usuarios sem Authorization deve retornar 200 — endpoint público no ServeRest.
     ...                Documenta que a listagem de usuários não requer autenticação (risco de exposição de dados).
     [Tags]    segurança    autenticação    positivo
     Quando Acesso Usuarios Sem Token
     Então A API Deve Aceitar Endpoint Público
 
-CT-41: Acessar /produtos Com Token Inválido
+CT-SEC-02: Acessar /produtos Com Token Inválido
     [Documentation]    POST /produtos com token Bearer forjado deve retornar 401.
     [Tags]    segurança    autenticação    negativo
     Quando Acesso Produtos Com Token Inválido
     Então A API Deve Retornar Não Autorizado
 
-CT-42: Criar Produto Sem Token
+CT-SEC-03: Criar Produto Sem Token
     [Documentation]    POST /produtos sem header Authorization deve retornar 401.
     [Tags]    segurança    autenticação    negativo
     Quando Crio Produto Sem Token
     Então A API Deve Retornar Não Autorizado
 
-CT-43: Atualizar Usuário De Outro Usuário
+CT-SEC-04: Atualizar Usuário De Outro Usuário
     [Documentation]    Usuário não-admin tenta PUT /usuarios/{id_admin} com seu próprio token.
     ...                ServeRest não implementa isolamento de ownership — documenta o comportamento atual.
     [Tags]    segurança    autorização
@@ -35,28 +35,28 @@ CT-43: Atualizar Usuário De Outro Usuário
     Quando Atualizo Usuário De Outro Com Token Próprio    ${ID_ADMIN}    ${TOKEN_NAO_ADMIN}
     Então A API Deve Bloquear Ou Aceitar Sem Escalar Privilégio
 
-CT-44: Deletar Produto De Outro Usuário
+CT-SEC-05: Deletar Produto De Outro Usuário
     [Documentation]    Usuário não-admin tenta DELETE /produtos/{id} — deve retornar 403.
     [Tags]    segurança    autorização    negativo
     Dado Que Existe Um Usuário Não Admin Provisionado
     Quando Deleto Produto Com Token De Não Admin    ${ID_PRODUTO_SEC}    ${TOKEN_NAO_ADMIN}
     Então A API Deve Retornar Proibido
 
-CT-45: SQL Injection No Campo Email
+CT-SEC-06: SQL Injection No Campo Email
     [Documentation]    POST /login com payload SQL injection no campo email não deve retornar 500.
     ...                Comportamento esperado: 400 (validação de formato) ou 401 (credencial inválida).
     [Tags]    segurança    injeção    negativo
     Quando Envio SQL Injection No Campo Email
     Então A API Não Deve Retornar Erro Interno
 
-CT-46: XSS Payload No Campo Nome
+CT-SEC-07: XSS Payload No Campo Nome
     [Documentation]    POST /usuarios com script XSS no campo nome não deve retornar 500.
     ...                Documenta se a API sanitiza ou rejeita o payload.
     [Tags]    segurança    injeção    negativo
     Quando Envio XSS Payload No Campo Nome
     Então A API Não Deve Retornar Erro Interno
 
-CT-47: JSON Injection Na Requisição
+CT-SEC-08: JSON Injection Na Requisição
     [Documentation]    POST /login com campos extras (__proto__, role, admin) não deve retornar 500.
     ...                Documenta resistência a prototype pollution e escalada de privilégio via JSON.
     [Tags]    segurança    injeção    negativo
@@ -68,13 +68,11 @@ CT-47: JSON Injection Na Requisição
 # ── Setup da suite ────────────────────────────────────────────────────────────
 
 Inicializar Suite De Segurança
-    [Documentation]    Cria sessão, obtém token de admin e provisiona produto para testes de autorização.
-    # TOKEN_ADMIN e ID_ADMIN expostos como variáveis de suite para CT-43 e CT-44.
+    [Documentation]    Cria sessão, garante admin, obtém token e provisiona produto para testes de autorização.
     Criar Sessão ServeRest
+    Garantir Admin Existe
     ${token}    Pegar Token de Autenticação
     Set Suite Variable    ${TOKEN_ADMIN}    ${token}
-    # Obtém o ID do admin via GET /usuarios com params= para evitar que o = no query string
-    # seja interpretado pelo Robot Framework como argumento nomeado.
     ${params}     Create Dictionary    email=${ADMIN_EMAIL}
     ${res_user}   GET On Session    serverest    /usuarios
     ...    params=${params}    expected_status=any    verify=${VERIFY_SSL}

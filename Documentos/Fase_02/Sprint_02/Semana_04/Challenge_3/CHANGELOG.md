@@ -5,6 +5,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.1-challenge04] — 2026-04-09
+
+### Changed
+
+- `tests/02_usuarios.robot` — absorveu todos os CTs de `04_usuarios_update.robot` (CT-USR-10 a CT-USR-12); suite agora cobre CT-USR-01 a CT-USR-12 em um único arquivo
+- `tests/02_usuarios.robot` — Suite Setup atualizado para `Criar Sessão ServeRest E Criar Usuario Teste`; Suite Teardown atualizado para `Limpar Usuario Teste E Encerrar Sessão` (unifica limpeza do usuário de teste e `Delete All Sessions`)
+- `resources/users_page.resource` — absorveu toda a lógica de `users_update_page.resource`: variáveis `${ID_USUARIO_TESTE}` e `${EMAIL_USUARIO_TESTE}`, keywords `Criar Sessão ServeRest E Criar Usuario Teste`, `Limpar Usuario Teste`, `Atualizar Usuário Por ID` e `Buscar Usuário Por ID`
+- `README.md` — tabela de escopo atualizada: linha de `04_usuarios_update.robot` removida; `02_usuarios.robot` agora lista CT-USR-01 a CT-USR-12 com categoria Atualização; árvore de arquivos e comandos de execução atualizados
+
+### Removed
+
+- `tests/04_usuarios_update.robot` — removido após consolidação em `02_usuarios.robot`
+- `resources/users_update_page.resource` — removido após consolidação em `users_page.resource`
+
+---
+
 ## [v1.0-challenge04] — 2026-04-09
 
 ### Added

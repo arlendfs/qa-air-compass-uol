@@ -16,16 +16,29 @@ O objetivo é validar fluxos críticos da aplicação por meio de testes funcion
 
 ## 🎯 Escopo de Cobertura
 
-| Suite | Arquivo | CTs | Categorias |
-|---|---|---|---|
-| Login | `01_login.robot` | CT-01 a CT-07 | Positivo, Negativo, Contrato, Edge |
-| Usuários | `02_usuarios.robot` | CT-08 a CT-16 | Positivo, Negativo, Contrato, Bug |
-| Produtos | `03_produtos.robot` | CT-17 a CT-25 | Positivo, Negativo, Contrato, Bug, Edge |
-| Carrinho | `04_carrinho.robot` | CT-26 a CT-36 | Positivo, Negativo, Contrato, Edge, Segurança |
-| Atualização de Usuários | `04_usuarios_update.robot` | CT-37 a CT-39 | Positivo, Bug |
-| Segurança | `05_security.robot` | CT-40 a CT-47 | Autenticação, Autorização, Injeção |
-| Edge Cases | `06_edge_cases.robot` | CT-48 a CT-55 | Boundary, Unicode, Limites, Concorrência |
-| Performance | `07_performance.robot` | CT-56 a CT-60 | SLA, Carga Concorrente |
+| Suite | Arquivo | Prefixo | CTs | Categorias |
+|---|---|---|---|---|
+| Login | `01_login.robot` | `CT-LGN` | CT-LGN-01 a CT-LGN-07 | Positivo, Negativo, Contrato, Edge |
+| Usuários | `02_usuarios.robot` | `CT-USR` | CT-USR-01 a CT-USR-12 | Positivo, Negativo, Contrato, Atualização, Bug, Edge |
+| Produtos | `03_produtos.robot` | `CT-PRD` | CT-PRD-01 a CT-PRD-09 | Positivo, Negativo, Contrato, Bug, Edge |
+| Carrinho | `04_carrinho.robot` | `CT-CRT` | CT-CRT-01 a CT-CRT-11 | Positivo, Negativo, Contrato, Edge, Segurança |
+| Segurança | `05_security.robot` | `CT-SEC` | CT-SEC-01 a CT-SEC-08 | Autenticação, Autorização, Injeção |
+| Edge Cases | `06_edge_cases.robot` | `CT-EDG` | CT-EDG-01 a CT-EDG-08 | Boundary, Unicode, Limites, Concorrência |
+| Performance | `07_performance.robot` | `CT-PER` | CT-PER-01 a CT-PER-05 | SLA, Carga Concorrente |
+
+### Convenção de Identificadores
+
+Os casos de teste seguem o padrão `CT-<DOMÍNIO>-<NN>`, onde o prefixo identifica o domínio funcional e a numeração reinicia em `01` por domínio:
+
+| Prefixo | Domínio |
+|---|---|
+| `CT-LGN` | Login / Autenticação |
+| `CT-USR` | Usuários (criação, busca, atualização) |
+| `CT-PRD` | Produtos |
+| `CT-CRT` | Carrinho |
+| `CT-SEC` | Segurança |
+| `CT-EDG` | Edge Cases |
+| `CT-PER` | Performance |
 
 ### Endpoints Cobertos
 
@@ -51,13 +64,13 @@ O objetivo é validar fluxos críticos da aplicação por meio de testes funcion
 
 | Bug ID | Endpoint | Severidade | Test Case |
 |---|---|---|---|
-| BUG-12a | `PUT /usuarios/{id}` — aceita `nome` vazio | High | CT-38 |
-| BUG-12b | `PUT /usuarios/{id}` — aceita `password` vazio | High | CT-39 |
-| BUG-13 | `PUT /produtos/{id}` — permite nome duplicado | Medium | CT-21 |
-| BUG-14 | `DELETE /usuarios/{id}` — deleta usuário com carrinho ativo | High | CT-14 |
-| BUG-15 | `GET /usuarios` — endpoint público sem autenticação | Critical | CT-40 |
-| BUG-16 | `POST /usuarios` — aceita `nome` com 500+ chars | Low | CT-49 |
-| BUG-17 | `POST /produtos` — aceita `preco=0` | Low | CT-51 |
+| BUG-12a | `PUT /usuarios/{id}` — aceita `nome` vazio | High | CT-USR-11 |
+| BUG-12b | `PUT /usuarios/{id}` — aceita `password` vazio | High | CT-USR-12 |
+| BUG-13 | `PUT /produtos/{id}` — permite nome duplicado | Medium | CT-PRD-05 |
+| BUG-14 | `DELETE /usuarios/{id}` — deleta usuário com carrinho ativo | High | CT-USR-07 |
+| BUG-15 | `GET /usuarios` — endpoint público sem autenticação | Critical | CT-SEC-01 |
+| BUG-16 | `POST /usuarios` — aceita `nome` com 500+ chars | Low | CT-EDG-02 |
+| BUG-17 | `POST /produtos` — aceita `preco=0` | Low | CT-EDG-04 |
 
 > Detalhes completos em [`BUG_REPORT.md`](./BUG_REPORT.md)
 
@@ -69,20 +82,18 @@ O objetivo é validar fluxos críticos da aplicação por meio de testes funcion
 Challenge_3/
 │
 ├── tests/
-│   ├── 01_login.robot
-│   ├── 02_usuarios.robot
-│   ├── 03_produtos.robot
-│   ├── 04_carrinho.robot
-│   ├── 04_usuarios_update.robot
-│   ├── 05_security.robot
-│   ├── 06_edge_cases.robot
-│   └── 07_performance.robot
+│   ├── 01_login.robot              # CT-LGN-01 a CT-LGN-07
+│   ├── 02_usuarios.robot           # CT-USR-01 a CT-USR-12
+│   ├── 03_produtos.robot           # CT-PRD-01 a CT-PRD-09
+│   ├── 04_carrinho.robot           # CT-CRT-01 a CT-CRT-11
+│   ├── 05_security.robot           # CT-SEC-01 a CT-SEC-08
+│   ├── 06_edge_cases.robot         # CT-EDG-01 a CT-EDG-08
+│   └── 07_performance.robot        # CT-PER-01 a CT-PER-05
 │
 ├── resources/
 │   ├── common.resource
 │   ├── login_page.resource
 │   ├── users_page.resource
-│   ├── users_update_page.resource
 │   ├── prod_page.resource
 │   ├── cart_page.resource
 │   └── security.resource
@@ -186,10 +197,16 @@ robot -d ./logs --include performance tests/
 robot -d ./logs --include bug tests/
 ```
 
-### Execute uma suite específica
+### Execute por domínio (prefixo de CT)
 
 ```bash
-robot -d ./logs/performance tests/07_performance.robot
+robot -d ./logs tests/01_login.robot           # CT-LGN
+robot -d ./logs tests/02_usuarios.robot        # CT-USR (01-12, inclui atualização)
+robot -d ./logs tests/03_produtos.robot        # CT-PRD
+robot -d ./logs tests/04_carrinho.robot        # CT-CRT
+robot -d ./logs tests/05_security.robot        # CT-SEC
+robot -d ./logs tests/06_edge_cases.robot      # CT-EDG
+robot -d ./logs tests/07_performance.robot     # CT-PER
 ```
 
 ---
@@ -208,7 +225,7 @@ Bug         ██░░░░░░░░░░░░░░   5 CTs   (8%)
 
 ---
 
-## 👨‍💻 Autor
+## 👨💻 Autor
 
 **Arlen Freitas** — [GitHub](https://github.com/arlendfs)  
-Desenvolvedor — Automação de Testes · AI/R Compass UOL
+Estágio em QA — Automação de Testes · AI/R Compass UOL
