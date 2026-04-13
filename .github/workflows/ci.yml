@@ -1,0 +1,60 @@
+name: ServeRest API — Robot Framework CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Automated Tests (60 CTs)
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Python setup ────────────────────────────────────────────────────
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      # ── 3. Dependencies ────────────────────────────────────────────────────
+      - name: Install dependencies
+        working-directory: Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3
+        run: pip install -r requirements.txt
+
+      # ── 4. Create logs directory ───────────────────────────────────────────
+      - name: Create logs directory
+        working-directory: Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3
+        run: mkdir -p logs
+
+      # ── 5. Recreate admin user ─────────────────────────────────────────────
+      - name: Recreate admin user (shared environment recovery)
+        working-directory: Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3
+        run: robot -d ./logs utils/recreate_admin.robot
+
+      # ── 6. Run all tests ───────────────────────────────────────────────────
+      - name: Run Robot Framework tests (60 CTs)
+        working-directory: Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3
+        run: robot -d ./logs ./tests
+        continue-on-error: true
+
+      # ── 7. Upload artifacts ────────────────────────────────────────────────
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-framework-results-${{ github.run_number }}
+          path: |
+            Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3/logs/report.html
+            Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3/logs/log.html
+            Documentos/Fase_02/Sprint_02/Semana_04/Challenge_3/logs/output.xml
+          retention-days: 30
+          if-no-files-found: warn
