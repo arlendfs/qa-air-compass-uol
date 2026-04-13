@@ -49,9 +49,43 @@ Então O Cadastro De Produto Deve Ter Sucesso
     Should Be Equal As Strings     ${res.json()['message']}    Cadastro realizado com sucesso
 
 Então O Cadastro De Produto Deve Falhar Com
-    [Documentation]    Valida status 400 e a mensagem de erro esperada.
+    [Documentation]    Valida status 400 e mensagem de erro. Loga body para debug.
     [Arguments]    ${mensagem_esperada}    ${res}=${RESPOSTA_PRODUTO}
-    Validar Resposta Da API    ${res}    400    ${mensagem_esperada}
+    ${status}    Set Variable    ${res.status_code}
+    ${body}      Set Variable    ${res.json()}
+    Log    [DEBUG] Status: ${status} | Body: ${body}    DEBUG
+    Should Be Equal As Integers    ${status}    400
+    ${tem_message}    Run Keyword And Return Status    Dictionary Should Contain Key    ${body}    message
+    IF    ${tem_message}
+        Should Be Equal As Strings    ${body}[message]    ${mensagem_esperada}
+    ELSE
+        ${chaves}    Get Dictionary Keys    ${body}
+        Log    [DEBUG] Campos retornados no erro 400: ${chaves}    DEBUG
+        ${campo}    Set Variable    ${chaves}[0]
+        ${valor}    Get From Dictionary    ${body}    ${campo}
+        Should Be Equal As Strings    ${valor}    ${mensagem_esperada}
+    END
+
+Então O Contrato Do Produto Deve Estar Correto
+    [Documentation]    Valida schema completo de GET /produtos/{id}: cinco campos obrigatórios com tipos corretos.
+    [Arguments]    ${res}=${RESPOSTA_PRODUTO}
+    Should Be Equal As Integers    ${res.status_code}    200
+    ${body}    Set Variable    ${res.json()}
+    Dictionary Should Contain Key    ${body}    nome
+    Dictionary Should Contain Key    ${body}    preco
+    Dictionary Should Contain Key    ${body}    descricao
+    Dictionary Should Contain Key    ${body}    quantidade
+    Dictionary Should Contain Key    ${body}    _id
+    ${preco}    Get From Dictionary    ${body}    preco
+    ${qtd}      Get From Dictionary    ${body}    quantidade
+    Should Be True    isinstance($preco, (int, float))
+    Should Be True    isinstance($qtd, int)
+
+Então A Operação De Produto Não Deve Ser Erro Interno
+    [Documentation]    Valida que a API não retornou 500 (comportamento defensivo para IDs inválidos).
+    [Arguments]    ${res}=${RESPOSTA_PRODUTO}
+    Should Not Be Equal As Integers    ${res.status_code}    500
+    Log    Status retornado: ${res.status_code} | Body: ${res.text}    DEBUG
 
 Então A Listagem De Produtos Deve Estar Correta
     [Documentation]    Valida status 200, campos do envelope e contrato do primeiro produto da lista.
@@ -98,4 +132,22 @@ Buscar Produto Por ID
     [Arguments]    ${produto_id}
     ${res}    GET On Session    serverest    /produtos/${produto_id}
     ...    expected_status=any    verify=${VERIFY_SSL}
+    RETURN    ${res}
+
+Atualizar Produto
+    [Documentation]    Primitiva HTTP: PUT /produtos/{id}.
+    [Arguments]    ${produto_id}    ${nome}    ${preco}    ${descricao}    ${quantidade}    ${token}
+    ${headers}    Create Dictionary    Authorization=${token}
+    ${body}    Create Dictionary    nome=${nome}    preco=${preco}
+    ...    descricao=${descricao}    quantidade=${quantidade}
+    ${res}    PUT On Session    serverest    /produtos/${produto_id}    json=${body}
+    ...    headers=${headers}    expected_status=any    verify=${VERIFY_SSL}
+    RETURN    ${res}
+
+Deletar Produto
+    [Documentation]    Primitiva HTTP: DELETE /produtos/{id}.
+    [Arguments]    ${produto_id}    ${token}
+    ${headers}    Create Dictionary    Authorization=${token}
+    ${res}    DELETE On Session    serverest    /produtos/${produto_id}
+    ...    headers=${headers}    expected_status=any    verify=${VERIFY_SSL}
     RETURN    ${res}

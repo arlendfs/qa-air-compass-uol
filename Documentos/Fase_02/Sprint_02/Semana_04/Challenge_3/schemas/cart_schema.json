@@ -1,0 +1,40 @@
+{
+  "schemas": {
+    "post_201": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "POST /carrinhos — 201 Created",
+      "type": "object",
+      "required": ["message", "_id"],
+      "additionalProperties": false,
+      "properties": {
+        "message": { "type": "string" },
+        "_id":     { "type": "string", "minLength": 1 }
+      }
+    },
+    "get_by_id_200": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GET /carrinhos/{id} — 200 OK",
+      "type": "object",
+      "required": ["_id", "produtos", "quantidadeTotal", "precoTotal", "idUsuario"],
+      "additionalProperties": false,
+      "properties": {
+        "_id":             { "type": "string", "minLength": 1 },
+        "idUsuario":       { "type": "string", "minLength": 1 },
+        "precoTotal":      { "type": "number", "minimum": 0 },
+        "quantidadeTotal": { "type": "integer", "minimum": 0 },
+        "produtos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["idProduto", "quantidade", "precoUnitario"],
+            "properties": {
+              "idProduto":     { "type": "string", "minLength": 1 },
+              "quantidade":    { "type": "integer", "minimum": 1 },
+              "precoUnitario": { "type": "number", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

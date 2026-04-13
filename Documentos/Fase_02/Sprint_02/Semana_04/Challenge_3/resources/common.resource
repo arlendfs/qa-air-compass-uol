@@ -22,12 +22,31 @@ Criar Sessão ServeRest
     Create Session    serverest    ${BASE_URL}    headers=${headers}
     ...    verify=${VERIFY_SSL}    disable_warnings=1
 
+Garantir Admin Existe
+    [Documentation]    Verifica se o admin existe tentando login. Se retornar 401, recria o usuário.
+    # Chamado no Suite Setup de qualquer suite que dependa do admin.
+    # Resolve o problema recorrente do ambiente compartilhado onde fulano@qa.com é deletado.
+    &{body_login}    Create Dictionary    email=${ADMIN_EMAIL}    password=${ADMIN_PASSWORD}
+    ${res}    POST On Session    serverest    /login    json=${body_login}
+    ...    expected_status=any    verify=${VERIFY_SSL}
+    IF    ${res.status_code} == 401
+        Log    Admin não encontrado — recriando fulano@qa.com...    WARN
+        &{body_user}    Create Dictionary
+        ...    nome=Fulano    email=${ADMIN_EMAIL}
+        ...    password=${ADMIN_PASSWORD}    administrador=true
+        POST On Session    serverest    /usuarios    json=${body_user}
+        ...    expected_status=any    verify=${VERIFY_SSL}
+        Log    Usuário admin recriado com sucesso.    INFO
+    END
+
 Pegar Token de Autenticação
     [Documentation]    Realiza login e retorna o Bearer token. Usa credenciais de admin por padrão.
     [Arguments]    ${email}=${ADMIN_EMAIL}    ${password}=${ADMIN_PASSWORD}
     &{body}    Create Dictionary    email=${email}    password=${password}
     ${res}    POST On Session    serverest    /login    json=${body}
     ...    expected_status=any    verify=${VERIFY_SSL}
+    Should Be Equal As Integers    ${res.status_code}    200
+    ...    msg=Falha no login com '${email}' — status: ${res.status_code} | body: ${res.text}. Verifique se o usuário existe no ambiente.
     ${token}    Get From Dictionary    ${res.json()}    authorization
     RETURN    ${token}
 
