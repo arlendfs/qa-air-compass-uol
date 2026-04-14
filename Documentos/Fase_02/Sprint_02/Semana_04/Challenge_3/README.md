@@ -107,10 +107,7 @@ Challenge_3/
 ├── utils/
 │   ├── concurrent_helper.py
 │   ├── performance.resource
-│   ├── recreate_admin.robot
-│   ├── contract.resource
-│   ├── logger.resource
-│   └── retry.resource
+│   └── recreate_admin.robot
 │
 ├── data/
 │   ├── login.json
