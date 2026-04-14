@@ -77,13 +77,14 @@ Quando Busco O Carrinho Por ID
 
 Quando Tento Adicionar Produto Sem Estoque
     [Documentation]    Cria produto com quantidade=0 e tenta adicioná-lo ao carrinho — força erro 400.
-    # ServeRest rejeita adição de produto sem estoque disponível.
+    # Cancela qualquer carrinho residual antes de tentar criar um novo — ServeRest só permite 1 carrinho por usuário.
+    Cancelar Compra    ${TOKEN}
     ${nome}        Gerar Nome Único    prefixo=Produto Sem Estoque
     ${res_prod}    Cadastrar Produto    ${nome}    100    Produto sem estoque    0    ${TOKEN}
     Should Be Equal As Integers    ${res_prod.status_code}    201
     ${id_sem_estoque}    Set Variable    ${res_prod.json()['_id']}
     ${res}    Criar Carrinho    ${TOKEN}    ${id_sem_estoque}    1
-    Log    [CT-32 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
+    Log    [CT-CRT-07 DEBUG] Status: ${res.status_code} | Body: ${res.text}    DEBUG
     Set Test Variable    ${RESPOSTA_CARRINHO}    ${res}
 
 Quando Tento Cancelar Sem Ter Um Carrinho
