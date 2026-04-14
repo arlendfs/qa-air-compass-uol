@@ -124,9 +124,10 @@ CT-EDG-08: Requisições Concorrentes Para POST /usuarios
 # ── Setup da suite ────────────────────────────────────────────────────────────
 
 Inicializar Suite De Edge Cases
-    [Documentation]    Cria sessão, garante admin e prepara fixtures para a suite.
+    [Documentation]    Cria sessão, garante admin, limpa carrinho residual e prepara fixtures para a suite.
     Criar Sessão ServeRest
     Garantir Admin Existe
+    Limpar Carrinho Residual Do Admin
     ${token}    Pegar Token de Autenticação
     Set Suite Variable    ${TOKEN_EDGE}    ${token}
     ${nome_longo}    Generate Random String    length=500    chars=[LETTERS][NUMBERS]
