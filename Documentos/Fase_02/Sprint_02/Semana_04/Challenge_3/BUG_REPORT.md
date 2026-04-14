@@ -1,9 +1,9 @@
 # Bug Report — ServeRest API
 **Project:** QA Automation — AI/R Compass UOL · Challenge 04  
 **Environment:** `https://compassuol.serverest.dev`  
-**Framework:** Robot Framework 7.4.2 · Python 3.14.3  
+**Framework:** Robot Framework 7.4.2 · Python 3.12  
 **Reported by:** Arlen Freitas  
-**Date:** 2026-04-09  
+**Date:** 2026-04-10  
 
 ---
 
@@ -69,8 +69,9 @@ The API accepts and persists the empty values without any validation error.
 | Security | An empty `password` effectively disables authentication for that user account |
 
 ### Evidence
-- Automated test: `CT-38` in `tests/04_usuarios_update.robot` — logs `WARN: BUG-12: API aceitou nome vazio`
-- Automated test: `CT-39` in `tests/04_usuarios_update.robot` — logs `WARN: BUG-12: API aceitou password vazio`
+- Automated test: `CT-USR-11` in `tests/02_usuarios.robot` — logs `WARN: BUG-12: API aceitou nome vazio`
+- Automated test: `CT-USR-12` in `tests/02_usuarios.robot` — logs `WARN: BUG-12: API aceitou password vazio`
+- Both tests consistently reproduce the bug on every execution against `compassuol.serverest.dev`
 
 ### Suggested Fix
 Apply the same Joi/validation schema used in `POST /usuarios` to the `PUT /usuarios/{id}` handler. Both `nome` and `password` should be validated as non-empty strings before persisting.
@@ -92,16 +93,19 @@ The `PUT /produtos/{id}` endpoint allows renaming a product to a name already us
 ```http
 # Step 1 — Create Product A
 POST /produtos
+Authorization: Bearer <admin_token>
 { "nome": "Produto A", "preco": 100, "descricao": "desc", "quantidade": 10 }
 # → 201 Created, _id: "id_produto_a"
 
 # Step 2 — Create Product B
 POST /produtos
+Authorization: Bearer <admin_token>
 { "nome": "Produto B", "preco": 200, "descricao": "desc", "quantidade": 5 }
 # → 201 Created
 
 # Step 3 — Rename Product A to "Produto B" (duplicate)
 PUT /produtos/id_produto_a
+Authorization: Bearer <admin_token>
 { "nome": "Produto B", "preco": 100, "descricao": "desc", "quantidade": 10 }
 ```
 
@@ -128,7 +132,8 @@ Two products now share the same name, violating the uniqueness constraint.
 | Consistency | Inconsistent behavior between `POST` (validates) and `PUT` (does not validate) |
 
 ### Evidence
-- Automated test: `CT-21` in `tests/03_produtos.robot` — logs `WARN: BUG-13: API permitiu atualizar produto com nome duplicado`
+- Automated test: `CT-PRD-05` in `tests/03_produtos.robot` — logs `WARN: BUG-13: API permitiu atualizar produto com nome duplicado`
+- Bug consistently reproduced on every execution
 
 ### Suggested Fix
 Apply the same uniqueness check used in `POST /produtos` to the `PUT /produtos/{id}` handler, excluding the product being updated from the duplicate check.
@@ -154,6 +159,7 @@ POST /usuarios
 
 # Step 2 — Create a product (admin token required)
 POST /produtos
+Authorization: Bearer <admin_token>
 { "nome": "Produto Teste", "preco": 100, "descricao": "desc", "quantidade": 5 }
 
 # Step 3 — Create a cart for the non-admin user
@@ -184,11 +190,12 @@ The user is deleted while the cart record remains active, creating an orphaned c
 | Severity | **High** |
 | Priority | **High** |
 | Affected endpoint | `DELETE /usuarios/{id}` |
-| Data integrity | Orphaned cart records reference a non-existent user `idUsuario`, breaking referential integrity |
+| Data integrity | Orphaned cart records reference a non-existent `idUsuario`, breaking referential integrity |
 | Business logic | Checkout and cancellation flows fail for orphaned carts since the user no longer exists |
 
 ### Evidence
-- Automated test: `CT-14` in `tests/02_usuarios.robot` — logs `WARN: BUG-14: API permitiu deletar usuário com carrinho ativo`
+- Automated test: `CT-USR-07` in `tests/02_usuarios.robot` — logs `WARN: BUG-14: API permitiu deletar usuário com carrinho ativo`
+- Bug is intermittent — the test uses `IF/ELSE` to document both outcomes without failing the pipeline
 
 ### Suggested Fix
 Add a pre-deletion check in the `DELETE /usuarios/{id}` handler to verify whether the user has any active cart before proceeding.
@@ -239,11 +246,11 @@ Full user list including passwords returned without authentication.
 | Priority | **High** |
 | Affected endpoint | `GET /usuarios` |
 | Security | Unauthenticated data exposure — passwords visible in plaintext |
-| Compliance | Violates basic API security principles (OWASP API Security Top 10 — API2: Broken Authentication) |
+| Compliance | Violates OWASP API Security Top 10 — API2: Broken Authentication |
 
 ### Evidence
-- Automated test: `CT-40` in `tests/05_security.robot` — documents that `GET /usuarios` returns `200` without a token
-- Test tag: `positivo` — the test passes because the API accepts the unauthenticated request, which is the documented (but insecure) behavior
+- Automated test: `CT-SEC-01` in `tests/05_security.robot` — documents that `GET /usuarios` returns `200` without a token
+- Test tagged `positivo` — passes because the API accepts the unauthenticated request, which is the documented (but insecure) behavior
 
 ### Suggested Fix
 Require a valid Bearer token for `GET /usuarios`. If public listing is a product requirement, at minimum remove `password` from the response payload.
@@ -259,7 +266,7 @@ The `POST /usuarios` endpoint accepts a `nome` field with 500 or more characters
 ```http
 POST /usuarios
 {
-  "nome": "AAAA...AAA",  // 500 characters
+  "nome": "AAAA...AAA",  // 500 random alphanumeric characters
   "email": "test@email.com",
   "password": "teste123",
   "administrador": "false"
@@ -288,7 +295,8 @@ HTTP 201 Created
 | UX | UI components rendering the `nome` field may overflow or break with excessively long values |
 
 ### Evidence
-- Automated test: `CT-49` in `tests/06_edge_cases.robot` — logs `WARN: OBSERVAÇÃO: API aceitou nome de 500 chars — sem limite de tamanho definido`
+- Automated test: `CT-EDG-02` in `tests/06_edge_cases.robot` — logs `WARN: OBSERVAÇÃO: API aceitou nome de 500 chars — sem limite de tamanho definido`
+- Reproduced consistently on every execution
 
 ### Suggested Fix
 Add a maximum length constraint to the `nome` field validation schema.
@@ -302,7 +310,7 @@ nome: Joi.string().min(1).max(100).required()
 ## BUG-17 — POST /produtos Accepts preco=0 (No Minimum Price Validation)
 
 ### Description
-The `POST /produtos` endpoint accepts `preco=0`, creating a product with a zero price. While `preco` with negative values is correctly rejected with `400`, zero is silently accepted. A product with zero price has no commercial meaning and likely indicates a data entry error.
+The `POST /produtos` endpoint accepts `preco=0`, creating a product with a zero price. While negative values are correctly rejected with `400`, zero is silently accepted. A product with zero price has no commercial meaning and likely indicates a data entry error.
 
 ### Steps to Reproduce
 ```http
@@ -338,7 +346,8 @@ HTTP 201 Created
 | Consistency | Inconsistent with the rejection of negative prices — zero should be treated the same way |
 
 ### Evidence
-- Automated test: `CT-51` in `tests/06_edge_cases.robot` — logs `WARN: OBSERVAÇÃO: API aceitou preco=0 — comportamento permissivo documentado`
+- Automated test: `CT-EDG-04` in `tests/06_edge_cases.robot` — logs `WARN: OBSERVAÇÃO: API aceitou preco=0 — comportamento permissivo documentado`
+- Reproduced consistently on every execution
 
 ### Suggested Fix
 Change the price validation from `>= 0` to `> 0`.
@@ -351,14 +360,59 @@ preco: Joi.number().min(0).required()
 
 ---
 
+## BUG-ENV-01 — Shared Environment: Admin User Deleted Between Test Runs
+
+### Description
+The test environment `compassuol.serverest.dev` is shared among all program participants. The admin user `fulano@qa.com` is periodically deleted by other users' test executions (e.g., tests that call `DELETE /usuarios` without proper cleanup). This causes all suites that depend on admin authentication to fail with `401 Unauthorized` at Suite Setup.
+
+### Steps to Reproduce
+```
+1. Run the full test suite successfully
+2. Wait for another participant to run a DELETE /usuarios test without cleanup
+3. Run the test suite again
+4. All suites fail at Suite Setup with:
+   "Falha no login com 'fulano@qa.com' — status: 401"
+```
+
+### Expected Result
+The admin user should persist between test runs. The environment should either protect the admin account or provide isolated environments per user.
+
+### Actual Result (Bug)
+```
+Suite setup failed:
+Falha no login com 'fulano@qa.com' — status: 401 | body: {"message": "Email e/ou senha inválidos"}
+```
+All 60 tests fail in cascade.
+
+### Impact
+| Dimension | Assessment |
+|---|---|
+| Severity | **High** (environment) |
+| Priority | **High** |
+| Affected | All 7 suites (60 tests) |
+| CI/CD | Pipeline fails on every affected run without manual intervention |
+| Reproducibility | Intermittent — depends on other participants' activity |
+
+### Evidence
+- Observed repeatedly across multiple test sessions
+- Affects suites: `01_login`, `02_usuarios`, `03_produtos`, `04_carrinho`, `05_security`, `06_edge_cases`, `07_performance`
+
+### Mitigation Applied
+- `utils/recreate_admin.robot` — standalone recovery script
+- `Garantir Admin Existe` keyword in `resources/common.resource` — called in every Suite Setup; silently recreates the admin if login returns 401
+- `.github/workflows/ci.yml` — CI pipeline runs `recreate_admin.robot` as a dedicated step before the test suite
+
+---
+
 ## Summary Table
 
-| Bug ID | Endpoint | Severity | Priority | Status | Test Case |
-|---|---|---|---|---|---|
-| BUG-12a | `PUT /usuarios/{id}` | High | High | Open | CT-38 |
-| BUG-12b | `PUT /usuarios/{id}` | High | High | Open | CT-39 |
-| BUG-13 | `PUT /produtos/{id}` | Medium | Medium | Open | CT-21 |
-| BUG-14 | `DELETE /usuarios/{id}` | High | High | Open | CT-14 |
-| BUG-15 | `GET /usuarios` | Critical | High | Open | CT-40 |
-| BUG-16 | `POST /usuarios` | Low | Low | Open | CT-49 |
-| BUG-17 | `POST /produtos` | Low | Low | Open | CT-51 |
+| Bug ID | Endpoint | Severity | Priority | Status | Test Case | File |
+|---|---|---|---|---|---|---|
+| BUG-12a | `PUT /usuarios/{id}` — aceita `nome` vazio | High | High | Open | CT-USR-11 | `02_usuarios.robot` |
+| BUG-12b | `PUT /usuarios/{id}` — aceita `password` vazio | High | High | Open | CT-USR-12 | `02_usuarios.robot` |
+| BUG-13 | `PUT /produtos/{id}` — permite nome duplicado | Medium | Medium | Open | CT-PRD-05 | `03_produtos.robot` |
+| BUG-14 | `DELETE /usuarios/{id}` — deleta usuário com carrinho ativo | High | High | Open | CT-USR-07 | `02_usuarios.robot` |
+| BUG-15 | `GET /usuarios` — endpoint público sem autenticação | Critical | High | Open | CT-SEC-01 | `05_security.robot` |
+| BUG-16 | `POST /usuarios` — aceita `nome` com 500+ chars | Low | Low | Open | CT-EDG-02 | `06_edge_cases.robot` |
+| BUG-17 | `POST /produtos` — aceita `preco=0` | Low | Low | Open | CT-EDG-04 | `06_edge_cases.robot` |
+| BUG-ENV-01 | Ambiente compartilhado — admin deletado entre execuções | High | High | Mitigated | Todos | `common.resource` |
