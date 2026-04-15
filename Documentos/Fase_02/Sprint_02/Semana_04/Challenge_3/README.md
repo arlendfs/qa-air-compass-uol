@@ -1,5 +1,5 @@
 ![Robot Framework](https://img.shields.io/badge/Robot%20Framework-7.4.2-green)
-![Python](https://img.shields.io/badge/Python-3.14.3-blue)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![Status](https://img.shields.io/badge/status-Challenge%2004%20Complete-brightgreen)
 ![Tests](https://img.shields.io/badge/tests-60%20CTs-informational)
 ![Bugs](https://img.shields.io/badge/bugs%20found-7-red)
@@ -137,7 +137,7 @@ Challenge_3/
 |---|---|---|
 | Robot Framework | 7.4.2 | Framework de automação |
 | RequestsLibrary | latest | Requisições HTTP |
-| Python | 3.14.3 | Runtime e helpers |
+| Python | 3.12 | Runtime e helpers |
 | `concurrent.futures` | stdlib | Testes de concorrência |
 | `requests` | latest | HTTP no helper Python |
 
@@ -210,15 +210,30 @@ robot -d ./logs tests/07_performance.robot     # CT-PER
 
 ## 📊 Distribuição dos Testes por Categoria
 
+> Cada CT é contado **uma única vez** pela sua categoria principal. CTs com múltiplas tags (ex: `negativo` + `edge`) são classificados pela tag mais específica.
+
 ```
-Positivo    ████████████░░░░  18 CTs  (30%)
-Negativo    ████████████████  22 CTs  (37%)
+Positivo    ████████░░░░░░░░  12 CTs  (20%)
+Negativo    ████████████████  31 CTs  (52%)
 Contrato    ████░░░░░░░░░░░░   6 CTs  (10%)
 Segurança   ████░░░░░░░░░░░░   8 CTs  (13%)
-Edge Cases  ████░░░░░░░░░░░░   8 CTs  (13%)
+Edge Cases  ████████░░░░░░░░  17 CTs  (28%)
 Performance ██░░░░░░░░░░░░░░   5 CTs   (8%)
-Bug         ██░░░░░░░░░░░░░░   5 CTs   (8%)
+Bug         ██░░░░░░░░░░░░░░   3 CTs   (5%)
 ```
+
+### Detalhamento por suite
+
+| Suite | Positivo | Negativo | Contrato | Segurança | Edge | Performance | Bug | Total |
+|---|---|---|---|---|---|---|---|---|
+| 01 Login | 1 | 5 | 1 | — | 1 | — | — | **7** |
+| 02 Usuários | 2 | 5 | 2 | — | 2 | — | 2 | **12** |
+| 03 Produtos | 2 | 5 | 1 | — | 3 | — | 1 | **9** |
+| 04 Carrinho | 3 | 6 | 2 | — | 3 | — | — | **11** |
+| 05 Segurança | 1 | 6 | — | 8 | — | — | — | **8** |
+| 06 Edge Cases | 3 | 4 | — | — | 8 | — | — | **8** |
+| 07 Performance | — | — | — | — | — | 5 | — | **5** |
+| **Total** | **12** | **31** | **6** | **8** | **17** | **5** | **3** | **60** |
 
 ---
 
